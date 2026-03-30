@@ -38,10 +38,10 @@ export default function Profile() {
 
   if (loading) return <div className="min-h-screen flex items-center justify-center"><div className="w-10 h-10 border-2 border-violet-600 border-t-transparent rounded-full animate-spin" /></div>;
   if (!user) return <div className="min-h-screen flex items-center justify-center px-4 pt-20">
-    <div className="glass-card rounded-2xl p-8 text-center max-w-sm">
-      <Shield size={28} className="text-violet-400 mx-auto mb-3" />
-      <p className="text-white font-semibold mb-3">Please sign in to view your profile</p>
-      <Link to="/login" className="px-6 py-2.5 rounded-xl bg-violet-600 text-white font-semibold hover:bg-violet-700 transition-colors">Sign In</Link>
+    <div className="glass-card rounded-2xl p-8 text-center max-w-sm shadow-sm border border-nari-navy/10">
+      <Shield size={28} className="text-nari-navy mx-auto mb-3" />
+      <p className="text-nari-navy font-bold mb-3">Please sign in to view your profile</p>
+      <Link to="/login" className="px-6 py-2.5 rounded-xl bg-nari-navy text-white font-bold hover:bg-[#132846] transition-colors shadow-md">Sign In</Link>
     </div>
   </div>;
 
@@ -50,37 +50,37 @@ export default function Profile() {
   return (
     <div className="min-h-screen pt-20 pb-10 px-4 grid-bg">
       <div className="max-w-3xl mx-auto">
-        <h1 className="font-display text-3xl font-bold text-white mb-8">My Profile</h1>
+        <h1 className="font-display text-3xl font-bold text-nari-navy mb-8">My Profile</h1>
 
         <div className="grid md:grid-cols-3 gap-5">
           {/* Left: Avatar + stats */}
           <div className="space-y-4">
-            <div className="glass-card rounded-2xl p-6 text-center">
-              <div className="w-20 h-20 rounded-full bg-gradient-to-br from-violet-600 to-pink-500 flex items-center justify-center mx-auto mb-4 glow-violet">
+            <div className="glass-card rounded-2xl p-6 text-center shadow-sm">
+              <div className="w-20 h-20 rounded-full bg-nari-navy flex items-center justify-center mx-auto mb-4 shadow-md">
                 <User size={32} className="text-white" />
               </div>
-              <div className="text-white font-semibold text-lg">{isAnon ? 'Anonymous User' : (profile.name || user.displayName || 'User')}</div>
-              <div className="text-gray-500 text-sm mt-0.5">{isAnon ? 'Anonymous Session' : user.email}</div>
+              <div className="text-nari-navy font-bold text-lg">{isAnon ? 'Anonymous User' : (profile.name || user.displayName || 'User')}</div>
+              <div className="text-gray-600 font-medium text-sm mt-0.5">{isAnon ? 'Anonymous Session' : user.email}</div>
               {isAnon && (
-                <div className="mt-3 text-xs px-3 py-1.5 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-300">
+                <div className="mt-3 text-xs px-3 py-1.5 rounded-xl bg-nari-amber/10 border border-nari-amber/30 text-nari-amber font-semibold">
                   Anonymous account — data lost on sign out
                 </div>
               )}
             </div>
 
-            <div className="glass-card rounded-2xl p-5">
-              <h3 className="text-white font-medium mb-3 text-sm">Your Activity</h3>
+            <div className="glass-card rounded-2xl p-5 shadow-sm">
+              <h3 className="text-nari-navy font-bold mb-3 text-sm uppercase tracking-wider">Your Activity</h3>
               <div className="space-y-3">
                 {[
-                  { label: 'Reports Filed', value: reports.length, icon: FileText, color: 'text-violet-400' },
-                  { label: 'Resolved', value: reports.filter((r) => r.status === 'resolved').length, icon: CheckCircle, color: 'text-green-400' },
-                  { label: 'Pending', value: reports.filter((r) => r.status === 'pending').length, icon: AlertCircle, color: 'text-amber-400' },
+                  { label: 'Reports Filed', value: reports.length, icon: FileText, color: 'text-nari-navy' },
+                  { label: 'Resolved', value: reports.filter((r) => r.status === 'resolved').length, icon: CheckCircle, color: 'text-nari-teal' },
+                  { label: 'Pending', value: reports.filter((r) => r.status === 'pending').length, icon: AlertCircle, color: 'text-nari-amber' },
                 ].map(({ label, value, icon: Icon, color }) => (
                   <div key={label} className="flex items-center justify-between">
-                    <div className="flex items-center gap-2 text-gray-400 text-sm">
-                      <Icon size={13} className={color} />{label}
+                    <div className="flex items-center gap-2 text-gray-600 font-semibold text-sm">
+                      <Icon size={14} className={color} />{label}
                     </div>
-                    <span className="text-white font-semibold text-sm">{value}</span>
+                    <span className="text-nari-navy font-bold text-sm">{value}</span>
                   </div>
                 ))}
               </div>
@@ -98,40 +98,40 @@ export default function Profile() {
           {/* Right: Edit profile + reports */}
           <div className="md:col-span-2 space-y-5">
             {!isAnon && (
-              <div className="glass-card rounded-2xl p-6">
-                <h2 className="text-white font-semibold mb-4 flex items-center gap-2">
-                  <User size={15} className="text-violet-400" />
+              <div className="glass-card rounded-2xl p-6 shadow-sm">
+                <h2 className="text-nari-navy font-bold mb-4 flex items-center gap-2">
+                  <User size={15} className="text-nari-navy" />
                   Edit Profile
                 </h2>
                 <div className="space-y-4">
                   <div>
-                    <label className="text-xs text-gray-500 font-medium mb-1 block">Name</label>
+                    <label className="text-xs text-gray-500 font-bold mb-1 block uppercase tracking-wider">Name</label>
                     <input
                       id="profile-name"
                       type="text"
                       value={profile.name}
                       onChange={(e) => setProfile({ ...profile, name: e.target.value })}
-                      className="nari-input"
+                      className="nari-input bg-white border-nari-navy/20 text-nari-navy shadow-sm"
                       placeholder="Your name"
                     />
                   </div>
                   <div>
-                    <label className="text-xs text-gray-500 font-medium mb-1 block">Email</label>
+                    <label className="text-xs text-gray-500 font-bold mb-1 block uppercase tracking-wider">Email</label>
                     <div className="relative">
-                      <Mail size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-600" />
-                      <input type="email" value={user.email || ''} readOnly className="nari-input pl-9 opacity-50 cursor-not-allowed" />
+                      <Mail size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                      <input type="email" value={user.email || ''} readOnly className="nari-input bg-gray-50 border-nari-navy/10 text-gray-500 pl-9 opacity-70 cursor-not-allowed shadow-none" />
                     </div>
                   </div>
                   <div>
-                    <label className="text-xs text-gray-500 font-medium mb-1 block">Phone</label>
+                    <label className="text-xs text-gray-500 font-bold mb-1 block uppercase tracking-wider">Phone</label>
                     <div className="relative">
-                      <Phone size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-600" />
+                      <Phone size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
                       <input
                         id="profile-phone"
                         type="tel"
                         value={profile.phone}
                         onChange={(e) => setProfile({ ...profile, phone: e.target.value })}
-                        className="nari-input pl-9"
+                        className="nari-input bg-white border-nari-navy/20 text-nari-navy pl-9 shadow-sm"
                         placeholder="+91 XXXXX XXXXX"
                       />
                     </div>
@@ -140,7 +140,7 @@ export default function Profile() {
                     id="profile-save-btn"
                     onClick={saveProfile}
                     disabled={saving}
-                    className="px-6 py-2.5 rounded-xl bg-violet-600 text-white font-semibold hover:bg-violet-700 disabled:opacity-50 transition-all flex items-center gap-2"
+                    className="px-6 py-2.5 rounded-xl bg-nari-navy text-white font-bold hover:bg-[#132846] hover:shadow-md disabled:opacity-50 transition-all flex items-center gap-2 shadow-sm"
                   >
                     {saved ? <><CheckCircle size={15} />Saved!</> : saving ? 'Saving…' : 'Save Changes'}
                   </button>
@@ -149,16 +149,16 @@ export default function Profile() {
             )}
 
             {/* My reports */}
-            <div className="glass-card rounded-2xl p-6">
-              <h2 className="text-white font-semibold mb-4 flex items-center gap-2">
-                <FileText size={15} className="text-violet-400" />
+            <div className="glass-card rounded-2xl p-6 shadow-sm">
+              <h2 className="text-nari-navy font-bold mb-4 flex items-center gap-2">
+                <FileText size={15} className="text-nari-navy" />
                 My Reports
               </h2>
               {reports.length === 0 ? (
                 <div className="text-center py-8">
-                  <FileText size={24} className="text-gray-700 mx-auto mb-2" />
-                  <p className="text-gray-600 text-sm">No reports yet.</p>
-                  <Link to="/report" className="text-violet-400 text-sm hover:text-violet-300 transition-colors">File your first report →</Link>
+                  <FileText size={24} className="text-gray-400 mx-auto mb-2" />
+                  <p className="text-gray-500 font-semibold text-sm">No reports yet.</p>
+                  <Link to="/report" className="text-nari-teal font-bold text-sm hover:underline transition-all inline-block mt-2">File your first report →</Link>
                 </div>
               ) : (
                 <div className="space-y-2 max-h-72 overflow-y-auto pr-1">
@@ -166,14 +166,14 @@ export default function Profile() {
                     <Link
                       key={r.id}
                       to={'/track/' + r.id}
-                      className="flex items-center gap-3 p-3 rounded-xl bg-white/5 border border-white/5 hover:border-violet-600/20 hover:bg-violet-600/5 transition-all"
+                      className="flex items-center gap-3 p-3 rounded-xl bg-white border border-nari-navy/10 hover:border-nari-navy/30 hover:bg-gray-50 transition-all shadow-sm"
                     >
-                      <Lock size={13} className="text-violet-400 flex-shrink-0" />
+                      <Lock size={13} className="text-nari-navy flex-shrink-0" />
                       <div className="flex-1 min-w-0">
-                        <div className="text-white text-sm capitalize">{r.type?.replace('_', ' ')}</div>
-                        <div className="text-gray-500 text-xs truncate">{r.locationLabel || '—'}</div>
+                        <div className="text-nari-navy font-bold text-sm capitalize">{r.type?.replace('_', ' ')}</div>
+                        <div className="text-gray-600 font-medium text-xs truncate">{r.locationLabel || '—'}</div>
                       </div>
-                      <span className={`text-xs px-2 py-0.5 rounded-full ${r.status === 'resolved' ? 'badge-resolved' : 'badge-pending'}`}>{r.status}</span>
+                      <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${r.status === 'resolved' ? 'badge-resolved' : 'badge-pending'}`}>{r.status}</span>
                     </Link>
                   ))}
                 </div>

@@ -15,6 +15,15 @@ import SafetyMap from './pages/SafetyMap';
 import Dashboard from './pages/Dashboard';
 import Profile from './pages/Profile';
 
+// Admin Pages
+import AdminRoute from './components/AdminRoute';
+import AdminLayout from './layouts/AdminLayout';
+import AdminDashboard from './pages/admin/AdminDashboard';
+import AdminReports from './pages/admin/AdminReports';
+import AdminUsers from './pages/admin/AdminUsers';
+import AdminAlerts from './pages/admin/AdminAlerts';
+import AdminMap from './pages/admin/AdminMap';
+
 export default function App() {
   return (
     <AuthProvider>
@@ -45,6 +54,16 @@ export default function App() {
                   </ProtectedRoute>
                 }
               />
+
+              {/* Secure Admin Area */}
+              <Route path="/admin" element={<AdminRoute><AdminLayout /></AdminRoute>}>
+                <Route index element={<AdminDashboard />} />
+                <Route path="reports" element={<AdminReports />} />
+                <Route path="users" element={<AdminUsers />} />
+                <Route path="alerts" element={<AdminAlerts />} />
+                <Route path="map" element={<AdminMap />} />
+              </Route>
+
               {/* 404 */}
               <Route
                 path="*"

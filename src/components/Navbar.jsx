@@ -24,29 +24,36 @@ export default function Navbar() {
     navigate('/login');
   };
 
+  if (location.pathname.startsWith('/admin')) return null;
+
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 glass border-b border-white/5">
+    <nav className="fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-md shadow-sm border-b border-gray-100">
       <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
         {/* Logo */}
         <Link to="/" className="flex items-center gap-2 group">
-          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-violet-600 to-pink-500 flex items-center justify-center group-hover:scale-110 transition-transform">
-            <Shield size={16} className="text-white" />
+          <div className="flex items-center justify-center group-hover:scale-110 transition-transform">
+             <svg width="40" height="40" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+              {/* Upper purple curve */}
+              <path d="M 25 25 C 50 15, 80 20, 85 45 C 80 30, 50 25, 25 25 Z" fill="#7C3AED" />
+              {/* Lower light purple face curve */}
+              <path d="M 30 35 C 35 55, 40 60, 50 70 C 60 60, 65 55, 65 45 L 60 55 C 50 65, 45 60, 40 45 C 45 45, 45 40, 40 40 C 40 38, 42 35, 30 35 Z" fill="#A78BFA" />
+            </svg>
           </div>
-          <span className="font-display text-xl font-bold gradient-text">NARI</span>
+          <span className="font-display text-2xl font-bold gradient-text -ml-2">NARI</span>
         </Link>
 
-        {/* Desktop Nav */}
-        <div className="hidden md:flex items-center gap-1">
+        {/* Desktop Nav - Centered */}
+        <div className="hidden md:flex items-center gap-6 absolute left-1/2 -translate-x-1/2">
           {links.map(({ to, label }) => {
             const active = location.pathname === to;
             return (
               <Link
                 key={to}
                 to={to}
-                className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${
+                className={`text-sm font-bold transition-all border-b-2 py-1 ${
                   active
-                    ? 'bg-violet-600/20 text-violet-300 border border-violet-600/30'
-                    : 'text-gray-400 hover:text-white hover:bg-white/5'
+                    ? 'border-nari-navy text-nari-navy'
+                    : 'border-transparent text-gray-400 hover:text-nari-navy hover:border-gray-200'
                 }`}
               >
                 {label}
@@ -59,30 +66,30 @@ export default function Navbar() {
         <div className="hidden md:flex items-center gap-3">
           <Link
             to="/report"
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-red-500 text-white text-sm font-semibold animate-pulse-glow hover:bg-red-600 transition-colors"
+            className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-nari-coral text-white text-base font-bold animate-pulse-glow hover:bg-[#e55353] transition-colors shadow-lg"
           >
-            <AlertCircle size={14} />
+            <AlertCircle size={18} />
             SOS
           </Link>
           {user ? (
             <div className="flex items-center gap-2">
               <Link
                 to="/profile"
-                className="w-8 h-8 rounded-full bg-violet-600/30 border border-violet-600/40 flex items-center justify-center hover:bg-violet-600/50 transition-colors"
+                className="w-8 h-8 rounded-full bg-nari-navy/10 border border-nari-navy/20 flex items-center justify-center hover:bg-nari-navy/20 transition-colors"
               >
-                <User size={15} className="text-violet-300" />
+                <User size={15} className="text-nari-navy" />
               </Link>
               <button
                 onClick={handleLogout}
-                className="w-8 h-8 rounded-full bg-white/5 border border-white/10 flex items-center justify-center hover:bg-red-500/20 hover:border-red-500/40 transition-colors"
+                className="w-8 h-8 rounded-full bg-white border border-nari-navy/10 flex items-center justify-center hover:bg-nari-coral/10 hover:border-nari-coral/30 transition-colors"
               >
-                <LogOut size={14} className="text-gray-400 hover:text-red-400" />
+                <LogOut size={14} className="text-gray-500 hover:text-nari-coral" />
               </button>
             </div>
           ) : (
             <Link
               to="/login"
-              className="px-4 py-1.5 rounded-xl bg-violet-600 text-white text-sm font-semibold hover:bg-violet-700 transition-colors"
+              className="px-6 py-2.5 rounded-xl bg-nari-navy text-white text-base font-bold hover:bg-[#132846] transition-colors shadow-md"
             >
               Sign In
             </Link>
@@ -91,7 +98,7 @@ export default function Navbar() {
 
         {/* Mobile hamburger */}
         <button
-          className="md:hidden text-gray-400 hover:text-white transition-colors"
+          className="md:hidden text-gray-500 hover:text-nari-navy transition-colors"
           onClick={() => setOpen(!open)}
         >
           {open ? <X size={22} /> : <Menu size={22} />}
@@ -100,7 +107,7 @@ export default function Navbar() {
 
       {/* Mobile menu */}
       {open && (
-        <div className="md:hidden glass border-t border-white/5 px-4 pt-3 pb-4 space-y-1 animate-slide-up">
+        <div className="md:hidden glass border-t border-nari-navy/10 px-4 pt-3 pb-4 space-y-1 animate-slide-up">
           {links.map(({ to, label, icon: Icon }) => (
             <Link
               key={to}
@@ -108,8 +115,8 @@ export default function Navbar() {
               onClick={() => setOpen(false)}
               className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
                 location.pathname === to
-                  ? 'bg-violet-600/20 text-violet-300'
-                  : 'text-gray-400 hover:text-white'
+                  ? 'bg-nari-navy/10 text-nari-navy'
+                  : 'text-gray-500 hover:text-nari-navy'
               }`}
             >
               <Icon size={15} />
@@ -120,14 +127,14 @@ export default function Navbar() {
             <Link
               to="/report"
               onClick={() => setOpen(false)}
-              className="flex-1 flex items-center justify-center gap-1 py-2 rounded-xl bg-red-500 text-white text-sm font-semibold"
+              className="flex-1 flex items-center justify-center gap-1 py-2 rounded-xl bg-nari-coral text-white text-sm font-semibold"
             >
               <AlertCircle size={14} /> SOS
             </Link>
             {user ? (
               <button
                 onClick={handleLogout}
-                className="flex-1 py-2 rounded-xl bg-white/5 border border-white/10 text-gray-300 text-sm"
+                className="flex-1 py-2 rounded-xl bg-white border border-nari-navy/10 text-gray-600 text-sm"
               >
                 Sign Out
               </button>
@@ -135,7 +142,7 @@ export default function Navbar() {
               <Link
                 to="/login"
                 onClick={() => setOpen(false)}
-                className="flex-1 text-center py-2 rounded-xl bg-violet-600 text-white text-sm font-semibold"
+                className="flex-1 text-center py-2 rounded-xl bg-nari-navy text-white text-sm font-semibold"
               >
                 Sign In
               </Link>

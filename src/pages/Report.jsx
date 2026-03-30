@@ -95,60 +95,60 @@ export default function Report() {
   }
 
   return (
-    <div className="min-h-screen pt-20 pb-10 px-4 grid-bg">
-      <div className="max-w-2xl mx-auto">
+    <div className="min-h-screen pt-24 pb-10 px-4 bg-gray-50/50 flex flex-col items-center">
+      <div className="w-full max-w-xl">
         {/* Header */}
-        <div className="mb-8">
-          <h1 className="font-display text-3xl font-bold text-white mb-1">File a Report</h1>
-          <p className="text-gray-500 text-sm">Quick, secure, and anonymous if you choose.</p>
+        <div className="mb-8 text-center">
+          <h1 className="text-4xl font-black text-nari-navy mb-2 tracking-tight">File a Report</h1>
+          <p className="text-gray-600 text-base">Quick, secure, and anonymous if you choose.</p>
         </div>
 
         {/* Progress */}
         <div className="flex items-center mb-8">
           {STEPS.map((s, i) => (
             <div key={s} className="flex items-center flex-1 last:flex-none">
-              <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition-all ${
-                i < step ? 'bg-green-500 text-white' : i === step ? 'bg-violet-600 text-white' : 'bg-white/10 text-gray-500'
+              <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition-all shadow-sm ${
+                i < step ? 'bg-nari-teal text-white' : i === step ? 'bg-nari-navy text-white' : 'bg-white border border-nari-navy/20 text-gray-500'
               }`}>
                 {i < step ? <CheckCircle size={14} /> : i + 1}
               </div>
-              <span className={`ml-2 text-xs font-medium ${i === step ? 'text-violet-300' : 'text-gray-600'}`}>{s}</span>
-              {i < STEPS.length - 1 && <div className={`flex-1 h-px mx-3 ${i < step ? 'bg-green-500/50' : 'bg-white/10'}`} />}
+              <span className={`ml-2 text-xs font-bold ${i === step ? 'text-nari-navy' : 'text-gray-500'}`}>{s}</span>
+              {i < STEPS.length - 1 && <div className={`flex-1 h-px mx-3 ${i < step ? 'bg-nari-teal/50' : 'bg-nari-navy/10'}`} />}
             </div>
           ))}
         </div>
 
-        <div className="glass-card rounded-3xl p-6 md:p-8">
+        <div className="zomato-card bg-white p-6 md:p-10">
           {/* Anonymous toggle */}
-          <div className="flex items-center justify-between mb-6 p-3 rounded-xl bg-white/5 border border-white/10">
+          <div className="flex items-center justify-between mb-6 p-3 rounded-xl bg-white border border-nari-navy/10 shadow-sm">
             <div className="flex items-center gap-2">
-              <EyeOff size={16} className="text-gray-400" />
-              <span className="text-sm text-gray-300 font-medium">Anonymous Report</span>
+              <EyeOff size={16} className="text-gray-500" />
+              <span className="text-sm text-nari-navy font-bold">Anonymous Report</span>
             </div>
             <button
               onClick={() => setAnonymous(!anonymous)}
-              className={`relative w-12 h-6 rounded-full transition-colors ${anonymous ? 'bg-violet-600' : 'bg-white/20'}`}
+              className={`relative w-12 h-6 rounded-full transition-colors shadow-inner border border-nari-navy/10 ${anonymous ? 'bg-nari-navy' : 'bg-gray-100'}`}
             >
-              <div className={`absolute top-1 w-4 h-4 rounded-full bg-white transition-all ${anonymous ? 'left-7' : 'left-1'}`} />
+              <div className={`absolute top-1 w-4 h-4 rounded-full bg-white transition-all shadow-sm ${anonymous ? 'left-7' : 'left-1'}`} />
             </button>
           </div>
 
           {/* Step 0: Category */}
           {step === 0 && (
             <div className="animate-fade-in">
-              <h2 className="text-white font-semibold mb-4">What happened?</h2>
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+              <h2 className="text-nari-navy font-bold mb-4">What happened?</h2>
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                 {CATEGORIES.map(({ id, label, emoji, color }) => (
                   <button
                     key={id}
                     id={`cat-${id}`}
                     onClick={() => setForm({ ...form, type: id })}
-                    className={`p-4 rounded-xl border-2 text-left transition-all hover:scale-[1.02] ${
-                      form.type === id ? color + ' scale-[1.02]' : 'border-white/10 bg-white/5 text-gray-400 hover:border-white/20'
+                    className={`flex flex-col items-center justify-center p-6 min-h-[140px] rounded-3xl border-2 transition-all hover:-translate-y-1 bg-white cursor-pointer ${
+                      form.type === id ? color + ' -translate-y-1 border-4 shadow-md' : 'border-gray-100 text-gray-400 hover:border-gray-200 hover:shadow-md'
                     }`}
                   >
-                    <div className="text-2xl mb-2">{emoji}</div>
-                    <div className="text-sm font-medium">{label}</div>
+                    <div className="text-4xl mb-3">{emoji}</div>
+                    <div className="text-sm font-bold text-center text-nari-navy">{label}</div>
                   </button>
                 ))}
               </div>
@@ -159,17 +159,17 @@ export default function Report() {
           {step === 1 && (
             <div className="animate-fade-in space-y-4">
               <div>
-                <label className="text-sm text-gray-400 font-medium mb-2 block">Describe the incident <span className="text-gray-600">(keep it factual)</span></label>
+                <label className="text-sm text-nari-navy font-bold mb-2 block">Describe the incident <span className="text-gray-500 font-normal">(keep it factual)</span></label>
                 <textarea
                   id="report-description"
                   value={form.description}
                   onChange={(e) => setForm({ ...form, description: e.target.value })}
                   placeholder="What happened? Who was involved? Any identifying details..."
                   rows={5}
-                  className="nari-input resize-none"
+                  className="nari-input resize-none w-full"
                 />
               </div>
-              <div className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-300 text-xs flex gap-2">
+              <div className="p-3 rounded-xl bg-nari-amber/10 border border-nari-amber/30 text-nari-amber font-semibold text-xs flex gap-2 shadow-sm">
                 <AlertCircle size={14} className="flex-shrink-0 mt-0.5" />
                 Do not include your own personal information. Stick to facts only.
               </div>
@@ -179,30 +179,30 @@ export default function Report() {
           {/* Step 2: Location */}
           {step === 2 && (
             <div className="animate-fade-in space-y-4">
-              <h2 className="text-white font-semibold">Where did it happen?</h2>
+              <h2 className="text-nari-navy font-bold">Where did it happen?</h2>
               <button
                 id="detect-location-btn"
                 onClick={detectLocation}
                 disabled={locLoading}
-                className="w-full py-3 rounded-xl glass border border-violet-600/30 text-violet-300 font-medium flex items-center justify-center gap-2 hover:bg-violet-600/10 transition-all disabled:opacity-50"
+                className="w-full py-4 rounded-xl bg-white border-2 border-dashed border-nari-navy/30 text-nari-navy font-bold flex items-center justify-center gap-2 hover:bg-gray-50 transition-all disabled:opacity-50"
               >
-                <MapPin size={16} />
+                <MapPin size={20} />
                 {locLoading ? 'Detecting…' : form.lat ? 'Location Detected ✓' : 'Auto-Detect My Location'}
               </button>
               {form.lat && (
-                <div className="p-3 rounded-xl bg-green-500/10 border border-green-500/30 text-green-300 text-sm">
+                <div className="p-3 rounded-xl bg-nari-teal/10 border border-nari-teal/30 text-nari-teal text-sm font-bold shadow-sm">
                   📍 {form.locationLabel}
                 </div>
               )}
               <div>
-                <label className="text-sm text-gray-400 mb-2 block">Or describe the location</label>
+                <label className="text-sm text-nari-navy font-bold mb-2 block">Or describe the location</label>
                 <input
                   id="location-label"
                   type="text"
                   value={form.locationLabel}
                   onChange={(e) => setForm({ ...form, locationLabel: e.target.value })}
                   placeholder="e.g. Near Metro Station Gate 2, Sector 5"
-                  className="nari-input"
+                  className="nari-input w-full"
                 />
               </div>
             </div>
@@ -211,35 +211,35 @@ export default function Report() {
           {/* Step 3: Review & Submit */}
           {step === 3 && (
             <div className="animate-fade-in space-y-4">
-              <h2 className="text-white font-semibold mb-4">Review & Submit</h2>
+              <h2 className="text-nari-navy font-bold mb-4">Review & Submit</h2>
               {[
                 { label: 'Category', value: CATEGORIES.find((c) => c.id === form.type)?.label || '—' },
                 { label: 'Description', value: form.description || '—' },
                 { label: 'Location', value: form.locationLabel || 'Not specified' },
                 { label: 'Anonymous', value: anonymous ? 'Yes' : 'No' },
               ].map(({ label, value }) => (
-                <div key={label} className="flex gap-3 p-3 rounded-xl bg-white/5 border border-white/10">
-                  <span className="text-gray-500 text-sm w-28 flex-shrink-0">{label}</span>
-                  <span className="text-white text-sm">{value}</span>
+                <div key={label} className="flex gap-3 p-3 rounded-xl bg-white border border-nari-navy/10 shadow-sm">
+                  <span className="text-gray-500 text-sm font-semibold w-28 flex-shrink-0">{label}</span>
+                  <span className="text-nari-navy font-medium text-sm">{value}</span>
                 </div>
               ))}
             </div>
           )}
 
           {/* Navigation */}
-          <div className="flex gap-3 mt-8">
+          <div className="flex gap-4 mt-10">
             {step > 0 && (
-              <button onClick={() => setStep(step - 1)} className="flex items-center gap-1 px-5 py-3 rounded-xl glass border border-white/10 text-gray-300 hover:bg-white/5 transition-all">
-                <ChevronLeft size={16} /> Back
+              <button onClick={() => setStep(step - 1)} className="flex items-center gap-1 px-6 py-4 rounded-xl bg-white border border-gray-200 text-nari-navy font-bold hover:bg-gray-50 transition-all text-lg">
+                <ChevronLeft size={20} /> Back
               </button>
             )}
             <button
               id="report-next-btn"
               disabled={(step === 0 && !form.type) || loading}
               onClick={() => step < STEPS.length - 1 ? setStep(step + 1) : submit()}
-              className="flex-1 flex items-center justify-center gap-1 py-3 rounded-xl bg-violet-600 text-white font-semibold hover:bg-violet-700 disabled:opacity-40 transition-all"
+              className="flex-1 flex items-center justify-center gap-2 py-4 rounded-xl bg-nari-navy text-white font-bold hover:bg-[#132846] disabled:opacity-40 transition-all shadow-md text-lg"
             >
-              {loading ? 'Submitting…' : step < STEPS.length - 1 ? (<>Next <ChevronRight size={16} /></>) : (<><CheckCircle size={16} /> Submit Report</>)}
+              {loading ? 'Submitting…' : step < STEPS.length - 1 ? (<>Next <ChevronRight size={20} /></>) : (<><CheckCircle size={20} /> Submit Report</>)}
             </button>
           </div>
         </div>

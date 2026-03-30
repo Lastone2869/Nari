@@ -2,7 +2,7 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { Shield, Mail, Lock, User, Eye, EyeOff, AlertCircle } from 'lucide-react';
-import { loginWithEmail, loginWithGoogle, registerWithEmail, loginAnonymously } from '../firebase/auth';
+import { loginWithEmail, loginWithGoogle, registerWithEmail, loginAnonymously, loginAsMagicAdmin } from '../firebase/auth';
 
 export default function Login() {
   const [mode, setMode] = useState('login'); // 'login' | 'register'
@@ -27,6 +27,19 @@ export default function Login() {
     }
   };
 
+  const handleAdmin = async () => {
+    setError('');
+    setLoading(true);
+    try {
+      await loginAsMagicAdmin();
+      navigate('/admin');
+    } catch (e) {
+      setError(e.message?.replace('Firebase: ', '').replace(/\(auth.*\)/, '') || 'Admin login failed.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const submit = (e) => {
     e.preventDefault();
     if (mode === 'login') handle(() => loginWithEmail(form.email, form.password));
@@ -34,33 +47,33 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-4 pt-20 pb-10 grid-bg">
+    <div className="min-h-screen flex items-center justify-center px-4 pt-16 bg-gray-50/50">
       {/* Background orbs */}
       <div className="fixed inset-0 pointer-events-none">
-        <div className="absolute top-1/3 left-1/4 w-80 h-80 bg-violet-600/15 rounded-full blur-3xl" />
-        <div className="absolute bottom-1/3 right-1/4 w-64 h-64 bg-pink-500/10 rounded-full blur-3xl" />
+        <div className="absolute top-1/3 left-1/4 w-80 h-80 bg-nari-navy/5 rounded-full blur-3xl" />
+        <div className="absolute bottom-1/3 right-1/4 w-64 h-64 bg-nari-teal/5 rounded-full blur-3xl" />
       </div>
 
       <div className="relative w-full max-w-md animate-slide-up">
         {/* Logo */}
         <div className="text-center mb-8">
-          <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-violet-600 to-pink-500 flex items-center justify-center mx-auto mb-4 glow-violet">
+          <div className="w-16 h-16 rounded-2xl bg-nari-navy flex items-center justify-center mx-auto mb-4 shadow-md">
             <Shield size={28} className="text-white" />
           </div>
-          <h1 className="font-display text-3xl font-bold gradient-text">NARI</h1>
-          <p className="text-gray-500 text-sm mt-1">Trust-First Safety Platform</p>
+          <h1 className="text-4xl font-black text-nari-navy uppercase tracking-widest">NARI</h1>
+          <p className="text-gray-600 font-medium text-sm mt-1">Trust-First Safety Platform</p>
         </div>
 
         {/* Card */}
-        <div className="glass-card rounded-3xl p-8">
+        <div className="zomato-card p-10">
           {/* Mode tabs */}
-          <div className="flex rounded-xl bg-white/5 p-1 mb-6">
+          <div className="flex rounded-xl bg-gray-100 p-1 mb-6 shadow-inner border border-nari-navy/5">
             {['login', 'register'].map((m) => (
               <button
                 key={m}
                 onClick={() => setMode(m)}
-                className={`flex-1 py-2 rounded-lg text-sm font-semibold capitalize transition-all ${
-                  mode === m ? 'bg-violet-600 text-white' : 'text-gray-500 hover:text-white'
+                className={`flex-1 py-2 rounded-lg text-sm font-bold capitalize transition-all ${
+                  mode === m ? 'bg-white text-nari-navy shadow-sm' : 'text-gray-500 hover:text-nari-navy'
                 }`}
               >
                 {m === 'login' ? 'Sign In' : 'Register'}
@@ -69,7 +82,7 @@ export default function Login() {
           </div>
 
           {error && (
-            <div className="flex items-start gap-2 p-3 rounded-xl bg-red-500/10 border border-red-500/30 text-red-300 text-sm mb-5">
+            <div className="flex items-start gap-2 p-3 rounded-xl bg-nari-coral/10 border border-nari-coral/30 text-nari-coral text-sm font-semibold mb-5 shadow-sm">
               <AlertCircle size={15} className="mt-0.5 flex-shrink-0" />
               {error}
             </div>
@@ -78,23 +91,23 @@ export default function Login() {
           <form onSubmit={submit} className="space-y-4">
             {mode === 'register' && (
               <div className="relative">
-                <User size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" />
+                <User size={20} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
                 <input id="reg-name" type="text" placeholder="Full name" value={form.name} onChange={set('name')}
-                  className="nari-input pl-9" required />
+                  className="nari-input pl-12" required />
               </div>
             )}
             <div className="relative">
-              <Mail size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" />
+              <Mail size={20} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
               <input id="auth-email" type="email" placeholder="Email address" value={form.email} onChange={set('email')}
-                className="nari-input pl-9" required />
+                className="nari-input pl-12" required />
             </div>
             <div className="relative">
-              <Lock size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" />
+              <Lock size={20} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
               <input id="auth-password" type={showPw ? 'text' : 'password'} placeholder="Password" value={form.password} onChange={set('password')}
-                className="nari-input pl-9 pr-10" required />
+                className="nari-input pl-12 pr-12" required />
               <button type="button" onClick={() => setShowPw(!showPw)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-white transition-colors">
-                {showPw ? <EyeOff size={15} /> : <Eye size={15} />}
+                className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-nari-navy transition-colors">
+                {showPw ? <EyeOff size={20} /> : <Eye size={20} />}
               </button>
             </div>
 
@@ -102,15 +115,15 @@ export default function Login() {
               id="auth-submit-btn"
               type="submit"
               disabled={loading}
-              className="w-full py-3 rounded-xl bg-violet-600 text-white font-semibold hover:bg-violet-700 disabled:opacity-50 transition-all hover:scale-[1.02] active:scale-95"
+              className="w-full py-4 rounded-xl bg-nari-navy text-white font-bold hover:bg-[#132846] hover:shadow-md disabled:opacity-50 transition-all hover:scale-[1.02] active:scale-95 text-lg shadow-sm mt-2"
             >
               {loading ? 'Please wait…' : mode === 'login' ? 'Sign In' : 'Create Account'}
             </button>
           </form>
 
           <div className="relative my-5">
-            <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-white/10" /></div>
-            <div className="relative text-center"><span className="px-3 text-xs text-gray-600 bg-transparent">or continue with</span></div>
+            <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-nari-navy/10" /></div>
+            <div className="relative text-center"><span className="px-3 text-xs font-semibold text-gray-400 uppercase tracking-wider bg-transparent">or continue with</span></div>
           </div>
 
           <div className="space-y-3">
@@ -118,7 +131,7 @@ export default function Login() {
               id="google-signin-btn"
               onClick={() => handle(loginWithGoogle)}
               disabled={loading}
-              className="w-full py-3 rounded-xl glass border border-white/10 text-white text-sm font-medium flex items-center justify-center gap-2 hover:bg-white/5 transition-all disabled:opacity-50"
+              className="w-full py-3 rounded-xl bg-white border border-nari-navy/20 text-nari-navy text-sm font-bold flex items-center justify-center gap-2 hover:bg-gray-50 shadow-sm transition-all disabled:opacity-50"
             >
               <svg width="18" height="18" viewBox="0 0 24 24">
                 <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
@@ -132,13 +145,21 @@ export default function Login() {
               id="anon-signin-btn"
               onClick={() => handle(loginAnonymously)}
               disabled={loading}
-              className="w-full py-3 rounded-xl glass border border-white/10 text-gray-400 text-sm font-medium hover:bg-white/5 transition-all disabled:opacity-50"
+              className="w-full py-3 rounded-xl bg-white border border-nari-navy/10 text-gray-600 text-sm font-bold hover:bg-gray-50 shadow-sm transition-all disabled:opacity-50"
             >
               Continue Anonymously
             </button>
+            <button
+              id="magic-admin-btn"
+              onClick={handleAdmin}
+              disabled={loading}
+              className="w-full py-3 rounded-xl bg-red-50 border border-red-100 text-red-600 text-sm font-bold hover:bg-red-100 shadow-sm transition-all disabled:opacity-50 mt-4"
+            >
+              🚀 Access Admin Dashboard (Dev ONLY)
+            </button>
           </div>
 
-          <p className="text-center text-gray-600 text-xs mt-5">
+          <p className="text-center text-gray-500 font-medium text-xs mt-6">
             By continuing you agree to report truthfully. False reports are a punishable offence.
           </p>
         </div>

@@ -48,6 +48,20 @@ export const loginWithGoogle = async () => {
 
 export const loginAnonymously = () => signInAnonymously(auth);
 
+// [Admin Testing Bailout]
+export const loginAsMagicAdmin = async () => {
+  const cred = await signInAnonymously(auth);
+  await setDoc(doc(db, 'users', cred.user.uid), {
+    name: 'Magic Admin',
+    email: 'admin@nari.local',
+    phone: '000-000-0000',
+    trustedContacts: [],
+    role: 'admin',
+    createdAt: serverTimestamp(),
+  });
+  return cred.user;
+};
+
 export const logout = () => signOut(auth);
 
 export const onAuth = (cb) => onAuthStateChanged(auth, cb);
