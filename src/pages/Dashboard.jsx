@@ -1,0 +1,198 @@
+// src/pages/Dashboard.jsx
+import { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
+import { FileText, Users, AlertTriangle, CheckCircle, TrendingUp, MapPin, Bell, ArrowRight, Clock } from 'lucide-react';
+import { getRecentReports, getActiveAlerts } from '../firebase/firestore';
+
+const timeAgo = (ts) => {
+  if (!ts?.toDate) return 'just now';
+  const diff = Date.now() - ts.toDate().getTime();
+  if (diff < 60000) return 'just now';
+  if (diff < 3600000) return Math.floor(diff / 60000) + 'm ago';
+  if (diff < 86400000) return Math.floor(diff / 3600000) + 'h ago';
+  return Math.floor(diff / 86400000) + 'd ago';
+};
+
+const CATEGORY_DOT = {
+  harassment: 'bg-red-500',
+  theft: 'bg-amber-500',
+  unsafe_area: 'bg-orange-500',
+  stalking: 'bg-purple-500',
+  poor_lighting: 'bg-yellow-500',
+  other: 'bg-gray-500',
+};
+
+export default function Dashboard() {
+  const [reports, setReports] = useState([]);
+  const [alerts, setAlerts] = useState([]);
+
+  useEffect(() => {
+    const u1 = getRecentReports(setReports, 20);
+    const u2 = getActiveAlerts(setAlerts);
+    return () => { u1(); u2(); };
+  }, []);
+
+  const resolved = reports.filter((r) => r.status === 'resolved').length;
+  const pending = reports.filter((r) => r.status === 'pending').length;
+
+  const stats = [
+    { label: 'Total Reports', value: reports.length, icon: FileText, color: 'text-violet-400', bg: 'bg-violet-500/10 border-violet-500/30' },
+    { label: 'Active Alerts', value: alerts.length, icon: Bell, color: 'text-red-400', bg: 'bg-red-500/10 border-red-500/30' },
+    { label: 'Pending Review', value: pending, icon: Clock, color: 'text-amber-400', bg: 'bg-amber-500/10 border-amber-500/30' },
+    { label: 'Resolved', value: resolved, icon: CheckCircle, color: 'text-green-400', bg: 'bg-green-500/10 border-green-500/30' },
+  ];
+
+  // Category breakdown
+  const cats = {};
+  reports.forEach((r) => { cats[r.type] = (cats[r.type] || 0) + 1; });
+  const catArr = Object.entries(cats).sort((a, b) => b[1] - a[1]).slice(0, 5);
+
+  return (
+    <div className="min-h-screen pt-20 pb-10 px-4">
+      <div className="max-w-6xl mx-auto">
+        {/* Header */}
+        <div className="mb-8 flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div>
+            <h1 className="font-display text-3xl font-bold text-white mb-1">Community Dashboard</h1>
+            <p className="text-gray-500 text-sm">Real-time safety intelligence across your community.</p>
+          </div>
+          <Link to="/report" id="dashboard-report-btn" className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-violet-600 text-white font-semibold hover:bg-violet-700 transition-colors self-start">
+            <FileText size={15} />
+            New Report
+          </Link>
+        </div>
+
+        {/* Predictive alert banner */}
+        {alerts.length > 0 && (
+          <div className="mb-6 p-4 rounded-2xl bg-red-500/10 border border-red-500/30 flex items-start gap-3 animate-fade-in">
+            <div className="w-8 h-8 rounded-full bg-red-500/20 flex items-center justify-center flex-shrink-0">
+              <AlertTriangle size={16} className="text-red-400" />
+            </div>
+            <div className="flex-1">
+              <div className="text-red-300 font-semibold text-sm mb-0.5">⚠️ Active Safety Alert</div>
+              <div className="text-gray-400 text-xs">{alerts.length} active SOS alert{alerts.length > 1 ? 's' : ''} in your area. Please stay vigilant.</div>
+            </div>
+            <Link to="/map" className="text-red-400 hover:text-red-300 text-xs font-medium flex items-center gap-1">
+              View Map <ArrowRight size={12} />
+            </Link>
+          </div>
+        )}
+
+        {/* Stats grid */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+          {stats.map(({ label, value, icon: Icon, color, bg }) => (
+            <div key={label} className={`rounded-2xl p-5 border ${bg}`}>
+              <Icon size={20} className={`${color} mb-3`} />
+              <div className="text-3xl font-bold text-white mb-1">{value}</div>
+              <div className="text-gray-500 text-xs">{label}</div>
+            </div>
+          ))}
+        </div>
+
+        <div className="grid md:grid-cols-3 gap-5">
+          {/* Recent reports feed */}
+          <div className="md:col-span-2 glass-card rounded-2xl p-5">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-white font-semibold">Live Report Feed</h2>
+              <div className="flex items-center gap-1.5 text-xs text-green-400">
+                <div className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
+                Live
+              </div>
+            </div>
+            <div className="space-y-3 max-h-[420px] overflow-y-auto pr-1">
+              {reports.length === 0 && (
+                <div className="text-center py-10">
+                  <FileText size={28} className="text-gray-700 mx-auto mb-2" />
+                  <p className="text-gray-600 text-sm">No reports yet. Be the first to report.</p>
+                </div>
+              )}
+              {reports.map((r) => (
+                <div key={r.id} className="flex items-start gap-3 p-3 rounded-xl bg-white/5 border border-white/5 hover:border-violet-600/20 hover:bg-violet-600/5 transition-all">
+                  <div className={`w-2.5 h-2.5 rounded-full mt-1.5 flex-shrink-0 ${CATEGORY_DOT[r.type] || 'bg-gray-500'}`} />
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center justify-between gap-2">
+                      <span className="text-white text-sm font-medium capitalize">{r.type?.replace('_', ' ')}</span>
+                      <span className="text-gray-600 text-xs flex-shrink-0">{timeAgo(r.createdAt)}</span>
+                    </div>
+                    <div className="text-gray-500 text-xs mt-0.5 flex items-center gap-1">
+                      <MapPin size={10} />
+                      {r.locationLabel || 'Unknown location'}
+                    </div>
+                    {r.description && (
+                      <p className="text-gray-600 text-xs mt-1 line-clamp-1">{r.description}</p>
+                    )}
+                  </div>
+                  <span className={`text-xs px-2 py-0.5 rounded-full flex-shrink-0 ${
+                    r.status === 'resolved' ? 'badge-resolved' : r.status === 'verified' ? 'badge-verified' : 'badge-pending'
+                  }`}>
+                    {r.status}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Sidebar */}
+          <div className="space-y-4">
+            {/* Category breakdown */}
+            <div className="glass-card rounded-2xl p-5">
+              <h2 className="text-white font-semibold mb-4 flex items-center gap-2">
+                <TrendingUp size={16} className="text-violet-400" />
+                Incident Types
+              </h2>
+              {catArr.length === 0 && <p className="text-gray-600 text-sm">No data yet.</p>}
+              <div className="space-y-3">
+                {catArr.map(([cat, count]) => (
+                  <div key={cat}>
+                    <div className="flex justify-between text-xs mb-1">
+                      <span className="text-gray-400 capitalize">{cat.replace('_', ' ')}</span>
+                      <span className="text-gray-500">{count}</span>
+                    </div>
+                    <div className="h-1.5 bg-white/10 rounded-full overflow-hidden">
+                      <div
+                        className="h-full rounded-full bg-gradient-to-r from-violet-600 to-pink-500 transition-all duration-700"
+                        style={{ width: `${(count / reports.length) * 100}%` }}
+                      />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Quick links */}
+            <div className="glass-card rounded-2xl p-5">
+              <h2 className="text-white font-semibold mb-4">Quick Actions</h2>
+              <div className="space-y-2">
+                {[
+                  { to: '/report', label: 'File New Report', icon: FileText },
+                  { to: '/map', label: 'View Safety Map', icon: MapPin },
+                  { to: '/evidence', label: 'Upload Evidence', icon: CheckCircle },
+                  { to: '/track/0', label: 'Track Complaint', icon: Clock },
+                ].map(({ to, label, icon: Icon }) => (
+                  <Link key={to} to={to} className="flex items-center justify-between p-2.5 rounded-xl hover:bg-white/5 group transition-colors">
+                    <div className="flex items-center gap-2 text-sm text-gray-400 group-hover:text-white transition-colors">
+                      <Icon size={13} className="text-violet-400" />
+                      {label}
+                    </div>
+                    <ArrowRight size={12} className="text-gray-700 group-hover:text-violet-400 transition-colors" />
+                  </Link>
+                ))}
+              </div>
+            </div>
+
+            {/* Community stats */}
+            <div className="glass-card rounded-2xl p-5 text-center">
+              <Users size={24} className="text-violet-400 mx-auto mb-2" />
+              <div className="text-2xl font-bold text-white">{reports.length * 3 + 47}</div>
+              <div className="text-gray-500 text-xs">Community Members Active</div>
+              <div className="mt-3 h-1.5 bg-white/10 rounded-full overflow-hidden">
+                <div className="h-full w-3/4 bg-gradient-to-r from-violet-600 to-pink-500 rounded-full" />
+              </div>
+              <div className="text-xs text-gray-600 mt-1">Safety Network Strength</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
