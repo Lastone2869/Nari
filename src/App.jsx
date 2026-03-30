@@ -12,7 +12,6 @@ import Report from './pages/Report';
 import Track from './pages/Track';
 import Evidence from './pages/Evidence';
 import SafetyMap from './pages/SafetyMap';
-import Dashboard from './pages/Dashboard';
 import Profile from './pages/Profile';
 
 // Admin Pages
@@ -37,7 +36,7 @@ export default function App() {
               <Route path="/report" element={<Report />} />
               <Route path="/track/:id?" element={<Track />} />
               <Route path="/map" element={<SafetyMap />} />
-              <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="/dashboard" element={<div className="pt-20 text-center text-gray-400 text-sm">Page removed.</div>} />
               <Route
                 path="/evidence"
                 element={

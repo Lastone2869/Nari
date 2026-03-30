@@ -1,7 +1,7 @@
 // src/components/Navbar.jsx
 import { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Shield, Menu, X, AlertCircle, User, LogOut, LayoutDashboard, MapPin, FileText, Lock } from 'lucide-react';
+import { Shield, Menu, X, AlertCircle, User, LogOut, MapPin, FileText, Lock } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { logout } from '../firebase/auth';
 
@@ -9,7 +9,6 @@ const links = [
   { to: '/', label: 'Home', icon: Shield },
   { to: '/map', label: 'Safety Map', icon: MapPin },
   { to: '/report', label: 'Report', icon: FileText },
-  { to: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
   { to: '/evidence', label: 'Evidence', icon: Lock },
 ];
 
@@ -66,9 +65,9 @@ export default function Navbar() {
         <div className="hidden md:flex items-center gap-3">
           <Link
             to="/report"
-            className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-nari-coral text-white text-base font-bold animate-pulse-glow hover:bg-[#e55353] transition-colors shadow-lg"
+            className="inline-flex items-center justify-center gap-1.5 h-10 px-4 rounded-xl bg-nari-coral text-white text-sm font-bold whitespace-nowrap animate-pulse-glow hover:bg-[#e55353] transition-colors shadow-md flex-shrink-0"
           >
-            <AlertCircle size={18} />
+            <AlertCircle size={15} />
             SOS
           </Link>
           {user ? (
@@ -89,7 +88,7 @@ export default function Navbar() {
           ) : (
             <Link
               to="/login"
-              className="px-6 py-2.5 rounded-xl bg-nari-navy text-white text-base font-bold hover:bg-[#132846] transition-colors shadow-md"
+              className="inline-flex items-center justify-center h-10 px-5 rounded-xl bg-nari-navy text-white text-sm font-bold whitespace-nowrap hover:bg-[#132846] transition-colors shadow-sm flex-shrink-0"
             >
               Sign In
             </Link>

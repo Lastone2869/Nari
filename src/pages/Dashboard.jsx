@@ -1,8 +1,13 @@
 // src/pages/Dashboard.jsx
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import { FileText, Users, AlertTriangle, CheckCircle, TrendingUp, MapPin, Bell, ArrowRight, Clock } from 'lucide-react';
-import { getRecentReports, getActiveAlerts } from '../firebase/firestore';
+import { Link, useNavigate } from 'react-router-dom';
+import {
+  FileText, MapPin, ShieldCheck, Clock, ArrowRight,
+  UploadCloud, AlertTriangle, CheckCircle2, Hourglass,
+  Activity, Lock, Plus
+} from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
+import { getUserReports } from '../firebase/firestore';
 
 const timeAgo = (ts) => {
   if (!ts?.toDate) return 'just now';
@@ -13,187 +18,211 @@ const timeAgo = (ts) => {
   return Math.floor(diff / 86400000) + 'd ago';
 };
 
-const CATEGORY_DOT = {
-  harassment: 'bg-red-500',
-  theft: 'bg-amber-500',
-  unsafe_area: 'bg-orange-500',
-  stalking: 'bg-purple-500',
-  poor_lighting: 'bg-yellow-500',
-  other: 'bg-gray-500',
+const TYPE_COLOR = {
+  harassment:   { bg: 'bg-red-100',    text: 'text-red-700',    dot: 'bg-red-500' },
+  stalking:     { bg: 'bg-purple-100', text: 'text-purple-700', dot: 'bg-purple-500' },
+  theft:        { bg: 'bg-amber-100',  text: 'text-amber-700',  dot: 'bg-amber-500' },
+  unsafe_area:  { bg: 'bg-orange-100', text: 'text-orange-700', dot: 'bg-orange-500' },
+  poor_lighting:{ bg: 'bg-yellow-100', text: 'text-yellow-700', dot: 'bg-yellow-500' },
+  other:        { bg: 'bg-gray-100',   text: 'text-gray-700',   dot: 'bg-gray-500' },
+};
+
+const STATUS_STYLE = {
+  pending:  { bg: 'bg-amber-50 border-amber-200',  text: 'text-amber-700',  icon: Hourglass,     label: 'Pending' },
+  verified: { bg: 'bg-blue-50 border-blue-200',    text: 'text-blue-700',   icon: CheckCircle2,  label: 'Verified' },
+  resolved: { bg: 'bg-emerald-50 border-emerald-200', text: 'text-emerald-700', icon: ShieldCheck, label: 'Resolved' },
 };
 
 export default function Dashboard() {
+  const { user } = useAuth();
+  const navigate = useNavigate();
   const [reports, setReports] = useState([]);
-  const [alerts, setAlerts] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const u1 = getRecentReports(setReports, 20);
-    const u2 = getActiveAlerts(setAlerts);
-    return () => { u1(); u2(); };
-  }, []);
+    if (!user) { navigate('/login'); return; }
+    const unsub = getUserReports(user.uid, (data) => {
+      setReports(data);
+      setLoading(false);
+    });
+    return unsub;
+  }, [user, navigate]);
 
-  const resolved = reports.filter((r) => r.status === 'resolved').length;
-  const pending = reports.filter((r) => r.status === 'pending').length;
+  const pending  = reports.filter(r => r.status === 'pending').length;
+  const verified = reports.filter(r => r.status === 'verified').length;
+  const resolved = reports.filter(r => r.status === 'resolved').length;
 
-  const stats = [
-    { label: 'Total Reports', value: reports.length, icon: FileText, color: 'text-nari-navy', bg: 'bg-nari-navy/10 border-nari-navy/20' },
-    { label: 'Active Alerts', value: alerts.length, icon: Bell, color: 'text-nari-coral', bg: 'bg-nari-coral/10 border-nari-coral/20' },
-    { label: 'Pending Review', value: pending, icon: Clock, color: 'text-nari-amber', bg: 'bg-nari-amber/10 border-nari-amber/20' },
-    { label: 'Resolved', value: resolved, icon: CheckCircle, color: 'text-nari-teal', bg: 'bg-nari-teal/10 border-nari-teal/20' },
+  const QUICK_ACTIONS = [
+    { to: '/report',   label: 'File a New Report',   icon: Plus,        color: 'bg-red-600 text-white hover:bg-red-700' },
+    { to: '/map',      label: 'View Safety Map',      icon: MapPin,      color: 'bg-nari-navy text-white hover:opacity-90' },
+    { to: '/evidence', label: 'My Evidence Locker',   icon: Lock,        color: 'bg-emerald-600 text-white hover:bg-emerald-700' },
+    { to: '/',         label: 'Back to Home & SOS',   icon: Activity,    color: 'bg-gray-900 text-white hover:bg-gray-800' },
   ];
 
-  // Category breakdown
-  const cats = {};
-  reports.forEach((r) => { cats[r.type] = (cats[r.type] || 0) + 1; });
-  const catArr = Object.entries(cats).sort((a, b) => b[1] - a[1]).slice(0, 5);
-
   return (
-    <div className="min-h-screen pt-24 pb-10 px-4 bg-gray-50/50">
-      <div className="max-w-6xl mx-auto">
+    <div className="min-h-screen pt-24 pb-16 px-4 bg-gray-50/50">
+      <div className="max-w-3xl mx-auto space-y-6">
+
         {/* Header */}
-        <div className="mb-10 flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-4xl font-black text-nari-navy mb-2 tracking-tight">Community Dashboard</h1>
-            <p className="text-gray-600 text-base">Real-time safety intelligence across your community.</p>
+            <h1 className="text-3xl font-black text-nari-navy tracking-tight">My Safety Hub</h1>
+            <p className="text-gray-500 text-sm mt-1 font-medium">
+              All your reports and activity in one place.
+            </p>
           </div>
-          <Link to="/report" id="dashboard-report-btn" className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-nari-navy text-white font-semibold hover:bg-[#132846] transition-colors self-start shadow-sm">
-            <FileText size={15} />
-            New Report
+          <Link
+            to="/report"
+            className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-red-600 text-white font-bold text-sm hover:bg-red-700 transition shadow-sm"
+          >
+            <Plus size={16} /> New Report
           </Link>
         </div>
 
-        {/* Predictive alert banner */}
-        {alerts.length > 0 && (
-          <div className="mb-6 p-4 rounded-2xl bg-nari-coral/10 border border-nari-coral/20 flex items-start gap-3 animate-fade-in shadow-sm">
-            <div className="w-8 h-8 rounded-full bg-nari-coral/20 flex items-center justify-center flex-shrink-0">
-              <AlertTriangle size={16} className="text-nari-coral" />
-            </div>
-            <div className="flex-1">
-              <div className="text-nari-coral font-bold text-sm mb-0.5">⚠️ Active Safety Alert</div>
-              <div className="text-gray-600 text-xs">{alerts.length} active SOS alert{alerts.length > 1 ? 's' : ''} in your area. Please stay vigilant.</div>
-            </div>
-            <Link to="/map" className="text-nari-coral hover:text-[#e55353] text-xs font-bold flex items-center gap-1">
-              View Map <ArrowRight size={12} />
-            </Link>
-          </div>
-        )}
-
-        {/* Stats grid */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-10">
-          {stats.map(({ label, value, icon: Icon, color, bg }) => (
-            <div key={label} className={`zomato-card bg-white p-6 ${bg.replace('bg-','').replace('border-','')} border-0`}>
-              <Icon size={24} className={`${color} mb-4 opacity-80`} />
-              <div className="text-4xl font-black text-nari-navy mb-1">{value}</div>
-              <div className="text-gray-500 text-xs font-bold uppercase tracking-widest">{label}</div>
+        {/* Stat cards */}
+        <div className="grid grid-cols-3 gap-3">
+          {[
+            { label: 'Submitted',  value: reports.length, icon: FileText,    color: 'text-nari-navy', bg: 'bg-nari-navy/8' },
+            { label: 'Pending',    value: pending,         icon: Hourglass,   color: 'text-amber-600', bg: 'bg-amber-50' },
+            { label: 'Resolved',   value: resolved,        icon: ShieldCheck, color: 'text-emerald-600', bg: 'bg-emerald-50' },
+          ].map(({ label, value, icon: Icon, color, bg }) => (
+            <div key={label} className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4 flex flex-col gap-2">
+              <div className={`w-9 h-9 rounded-xl flex items-center justify-center ${bg}`}>
+                <Icon size={18} className={color} />
+              </div>
+              <div className="text-2xl font-black text-nari-navy">{loading ? '—' : value}</div>
+              <div className="text-xs font-bold text-gray-400 uppercase tracking-widest">{label}</div>
             </div>
           ))}
         </div>
 
-        <div className="grid md:grid-cols-3 gap-6">
-          <div className="md:col-span-2 zomato-card bg-white p-6 md:p-8">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-nari-navy font-bold">Live Report Feed</h2>
-              <div className="flex items-center gap-1.5 text-xs text-nari-teal font-semibold">
-                <div className="w-1.5 h-1.5 rounded-full bg-nari-teal animate-pulse" />
-                Live
-              </div>
-            </div>
-            <div className="space-y-4 max-h-[500px] overflow-y-auto pr-2">
-              {reports.length === 0 && (
-                <div className="text-center py-16 border-2 border-dashed border-gray-200 rounded-3xl">
-                  <div className="w-16 h-16 rounded-full bg-gray-50 flex items-center justify-center mx-auto mb-4">
-                    <FileText size={32} className="text-gray-400" />
-                  </div>
-                  <p className="text-nari-navy font-bold text-lg mb-1">No reports yet</p>
-                  <p className="text-gray-500 text-sm">Your community is peaceful. Be the first to report an incident.</p>
-                </div>
-              )}
-              {reports.map((r) => (
-                <div key={r.id} className="flex items-start gap-4 p-5 rounded-2xl bg-gray-50 border border-gray-100 transition-all hover:bg-gray-100">
-                  <div className={`w-3 h-3 rounded-full mt-1.5 flex-shrink-0 ${CATEGORY_DOT[r.type] || 'bg-gray-500'}`} />
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center justify-between gap-2">
-                      <span className="text-nari-navy text-base font-bold capitalize">{r.type?.replace('_', ' ')}</span>
-                      <span className="text-gray-500 text-xs flex-shrink-0 font-bold">{timeAgo(r.createdAt)}</span>
-                    </div>
-                    <div className="text-gray-600 text-xs mt-1 flex items-center gap-1 font-medium">
-                      <MapPin size={12} />
-                      {r.locationLabel || 'Unknown location'}
-                    </div>
-                    {r.description && (
-                      <p className="text-gray-600 text-sm mt-2 line-clamp-2 leading-relaxed">{r.description}</p>
-                    )}
-                  </div>
-                  <span className={`text-xs px-3 py-1 rounded-full font-bold flex-shrink-0 ${
-                    r.status === 'resolved' ? 'badge-resolved' : r.status === 'verified' ? 'badge-verified' : 'badge-pending'
-                  }`}>
-                    {r.status}
-                  </span>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Sidebar */}
-          <div className="space-y-6">
-            {/* Category breakdown */}
-            <div className="zomato-card bg-white p-6">
-              <h2 className="text-nari-navy font-bold mb-4 flex items-center gap-2 text-lg">
-                <TrendingUp size={16} className="text-nari-teal" />
-                Incident Types
-              </h2>
-              {catArr.length === 0 && <p className="text-gray-500 text-sm">No data yet.</p>}
-              <div className="space-y-3">
-                {catArr.map(([cat, count]) => (
-                  <div key={cat}>
-                    <div className="flex justify-between text-xs mb-1 font-semibold">
-                      <span className="text-gray-600 capitalize">{cat.replace('_', ' ')}</span>
-                      <span className="text-nari-navy">{count}</span>
-                    </div>
-                    <div className="h-1.5 bg-nari-navy/10 rounded-full overflow-hidden">
-                      <div
-                        className="h-full rounded-full bg-gradient-to-r from-nari-navy to-nari-amber transition-all duration-700"
-                        style={{ width: `${(count / reports.length) * 100}%` }}
-                      />
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Quick links */}
-            <div className="zomato-card bg-white p-6">
-              <h2 className="text-nari-navy font-bold mb-4 text-lg">Quick Actions</h2>
-              <div className="space-y-2">
-                {[
-                  { to: '/report', label: 'File New Report', icon: FileText },
-                  { to: '/map', label: 'View Safety Map', icon: MapPin },
-                  { to: '/evidence', label: 'Upload Evidence', icon: CheckCircle },
-                  { to: '/track/0', label: 'Track Complaint', icon: Clock },
-                ].map(({ to, label, icon: Icon }) => (
-                  <Link key={to} to={to} className="flex items-center justify-between p-2.5 rounded-xl hover:bg-nari-navy/5 bg-white border border-nari-navy/5 shadow-sm group transition-colors">
-                    <div className="flex items-center gap-2 text-sm font-semibold text-gray-600 group-hover:text-nari-navy transition-colors">
-                      <Icon size={14} className="text-nari-teal" />
-                      {label}
-                    </div>
-                    <ArrowRight size={12} className="text-gray-400 group-hover:text-nari-navy transition-colors" />
-                  </Link>
-                ))}
-              </div>
-            </div>
-
-            {/* Community stats */}
-            <div className="zomato-card bg-white p-6 text-center">
-              <Users size={28} className="text-nari-teal mx-auto mb-3" />
-              <div className="text-2xl font-bold text-nari-navy">{reports.length * 3 + 47}</div>
-              <div className="text-gray-500 text-xs font-semibold">Community Members Active</div>
-              <div className="mt-3 h-1.5 bg-nari-navy/10 rounded-full overflow-hidden">
-                <div className="h-full w-3/4 bg-nari-teal rounded-full" />
-              </div>
-              <div className="text-xs text-nari-navy mt-1 font-semibold">Safety Network Strength</div>
-            </div>
-          </div>
+        {/* Quick actions */}
+        <div className="grid grid-cols-2 gap-3">
+          {QUICK_ACTIONS.map(({ to, label, icon: Icon, color }) => (
+            <Link
+              key={to}
+              to={to}
+              className={`flex items-center gap-3 px-4 py-3.5 rounded-2xl font-bold text-sm transition-all active:scale-95 shadow-sm ${color}`}
+            >
+              <Icon size={18} />
+              {label}
+              <ArrowRight size={14} className="ml-auto opacity-70" />
+            </Link>
+          ))}
         </div>
+
+        {/* My Reports */}
+        <div className="bg-white rounded-3xl border border-gray-100 shadow-sm overflow-hidden">
+          <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
+            <h2 className="font-black text-nari-navy flex items-center gap-2">
+              <Activity size={16} className="text-nari-teal" /> My Reports
+            </h2>
+            {reports.length > 0 && (
+              <span className="text-xs font-bold text-gray-400 bg-gray-100 px-2.5 py-1 rounded-full">
+                {reports.length} total
+              </span>
+            )}
+          </div>
+
+          {loading && (
+            <div className="p-12 text-center">
+              <div className="w-8 h-8 border-4 border-nari-navy border-t-transparent rounded-full animate-spin mx-auto mb-3" />
+              <p className="text-gray-400 font-medium text-sm">Loading your reports…</p>
+            </div>
+          )}
+
+          {!loading && reports.length === 0 && (
+            <div className="p-12 text-center">
+              <div className="w-14 h-14 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <FileText size={28} className="text-gray-400" />
+              </div>
+              <p className="text-nari-navy font-black text-lg mb-1">No reports yet</p>
+              <p className="text-gray-500 text-sm mb-5">Your submitted reports will appear here.</p>
+              <Link
+                to="/report"
+                className="inline-flex items-center gap-2 px-5 py-2.5 bg-red-600 text-white rounded-xl font-bold text-sm hover:bg-red-700 transition"
+              >
+                <Plus size={15} /> File Your First Report
+              </Link>
+            </div>
+          )}
+
+          {!loading && reports.length > 0 && (
+            <div className="divide-y divide-gray-100">
+              {reports.map((r) => {
+                const typeStyle   = TYPE_COLOR[r.type]   || TYPE_COLOR.other;
+                const statusStyle = STATUS_STYLE[r.status] || STATUS_STYLE.pending;
+                const StatusIcon  = statusStyle.icon;
+                return (
+                  <div key={r.id} className="px-6 py-4 hover:bg-gray-50/80 transition-colors">
+                    <div className="flex items-start gap-3">
+                      {/* Color dot */}
+                      <div className={`w-2.5 h-2.5 rounded-full mt-1.5 flex-shrink-0 ${typeStyle.dot}`} />
+
+                      <div className="flex-1 min-w-0">
+                        {/* Type + time */}
+                        <div className="flex items-center justify-between gap-2 mb-1">
+                          <span className={`text-xs font-black px-2 py-0.5 rounded-full ${typeStyle.bg} ${typeStyle.text} capitalize`}>
+                            {r.type?.replace(/_/g, ' ')}
+                          </span>
+                          <span className="text-xs text-gray-400 font-medium flex-shrink-0 flex items-center gap-1">
+                            <Clock size={11} /> {timeAgo(r.createdAt)}
+                          </span>
+                        </div>
+
+                        {/* Location */}
+                        {r.locationLabel && (
+                          <div className="text-xs text-gray-500 flex items-center gap-1 mb-1.5">
+                            <MapPin size={11} /> {r.locationLabel}
+                          </div>
+                        )}
+
+                        {/* Description */}
+                        {r.description && (
+                          <p className="text-sm text-gray-600 leading-relaxed line-clamp-2">{r.description}</p>
+                        )}
+                      </div>
+
+                      {/* Status badge */}
+                      <div className={`flex items-center gap-1 px-2.5 py-1 rounded-xl border text-xs font-bold flex-shrink-0 ${statusStyle.bg} ${statusStyle.text}`}>
+                        <StatusIcon size={12} />
+                        {statusStyle.label}
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
+
+        {/* Evidence & upload CTA */}
+        <div className="bg-nari-navy rounded-3xl p-6 flex items-center gap-5 shadow-md">
+          <div className="w-12 h-12 rounded-2xl bg-white/10 flex items-center justify-center flex-shrink-0">
+            <UploadCloud size={24} className="text-white" />
+          </div>
+          <div className="flex-1">
+            <div className="text-white font-black text-base mb-0.5">Evidence Locker</div>
+            <div className="text-white/60 text-xs font-medium">
+              Securely upload photos, audio, or video to support your reports.
+            </div>
+          </div>
+          <Link
+            to="/evidence"
+            className="flex-shrink-0 flex items-center gap-1.5 px-4 py-2 bg-white text-nari-navy font-black text-sm rounded-xl hover:bg-gray-100 transition"
+          >
+            Open <ArrowRight size={13} />
+          </Link>
+        </div>
+
+        {/* Tip */}
+        <div className="flex items-start gap-3 p-4 rounded-2xl bg-amber-50 border border-amber-200">
+          <AlertTriangle size={16} className="text-amber-600 flex-shrink-0 mt-0.5" />
+          <p className="text-xs font-medium text-amber-800">
+            <span className="font-black">Tip:</span> If your report status shows "Pending" for more than 48 hours, contact your local police station directly. Your reference number is the report ID.
+          </p>
+        </div>
+
       </div>
     </div>
   );

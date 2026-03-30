@@ -282,9 +282,9 @@ export default function Home() {
 
   return (
     <>
-    <div className="min-h-screen bg-gray-50/50 pb-24">
-      {/* Mobile-first constraint */}
-      <div className="max-w-md mx-auto min-h-screen flex flex-col pt-16 px-4">
+    <div className="min-h-screen bg-gray-50/50 pb-24 flex justify-center">
+      {/* Mobile-first constraint — centered on all screens */}
+      <div className="w-full max-w-md flex flex-col pt-16 px-4">
         
         {/* 1. Top Status Section */}
         <div className="flex items-center justify-between mb-8 mt-4 bg-white rounded-full px-4 py-2 border border-gray-100 shadow-sm">
