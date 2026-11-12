@@ -53,7 +53,7 @@ export default function AdminAlerts() {
                   <h3 className="text-lg font-black text-gray-900 mb-1">User ID: {a.userId?.slice(0, 8)}...</h3>
                   <div className="flex items-center gap-2 text-sm text-gray-500 font-bold">
                     <Clock size={14} className="text-red-500" />
-                    Started: {new Date(a.startedAt?.toDate?.() || Date.now()).toLocaleTimeString()}
+                    Started: {a.startedAt?.toDate?.().toLocaleTimeString() ?? 'just now'}
                   </div>
                 </div>
 

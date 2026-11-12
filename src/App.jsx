@@ -1,5 +1,4 @@
-// src/App.jsx
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Link } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
@@ -14,7 +13,6 @@ import Evidence from './pages/Evidence';
 import SafetyMap from './pages/SafetyMap';
 import Profile from './pages/Profile';
 
-// Admin Pages
 import AdminRoute from './components/AdminRoute';
 import AdminLayout from './layouts/AdminLayout';
 import AdminDashboard from './pages/admin/AdminDashboard';
@@ -27,7 +25,7 @@ export default function App() {
   return (
     <AuthProvider>
       <BrowserRouter>
-        <div className="min-h-screen flex flex-col noise">
+        <div className="noise flex min-h-screen flex-col">
           <Navbar />
           <main className="flex-1">
             <Routes>
@@ -36,7 +34,6 @@ export default function App() {
               <Route path="/report" element={<Report />} />
               <Route path="/track/:id?" element={<Track />} />
               <Route path="/map" element={<SafetyMap />} />
-              <Route path="/dashboard" element={<div className="pt-20 text-center text-gray-400 text-sm">Page removed.</div>} />
               <Route
                 path="/evidence"
                 element={
@@ -54,7 +51,6 @@ export default function App() {
                 }
               />
 
-              {/* Secure Admin Area */}
               <Route path="/admin" element={<AdminRoute><AdminLayout /></AdminRoute>}>
                 <Route index element={<AdminDashboard />} />
                 <Route path="reports" element={<AdminReports />} />
@@ -63,17 +59,18 @@ export default function App() {
                 <Route path="map" element={<AdminMap />} />
               </Route>
 
-              {/* 404 */}
               <Route
                 path="*"
                 element={
-                  <div className="min-h-screen flex flex-col items-center justify-center text-center px-4 pt-20">
-                    <div className="text-6xl mb-4">🔦</div>
-                    <h2 className="font-display text-3xl font-bold gradient-text mb-2">Page Not Found</h2>
-                    <p className="text-gray-500 mb-6">The page you're looking for doesn't exist.</p>
-                    <a href="/" className="px-6 py-3 rounded-xl bg-violet-600 text-white font-semibold hover:bg-violet-700 transition-colors">
+                  <div className="flex min-h-screen flex-col items-center justify-center px-4 pt-20 text-center">
+                    <div className="mb-5 flex h-20 w-20 items-center justify-center rounded-full bg-nari-coral/10 text-2xl font-black text-nari-coral">
+                      404
+                    </div>
+                    <h2 className="mb-2 font-display text-3xl font-bold text-nari-navy">Page Not Found</h2>
+                    <p className="mb-6 max-w-md text-gray-500">The page you&apos;re looking for doesn&apos;t exist or may have been moved.</p>
+                    <Link to="/" className="rounded-xl bg-nari-navy px-6 py-3 font-semibold text-white transition-colors hover:bg-[#132846]">
                       Go Home
-                    </a>
+                    </Link>
                   </div>
                 }
               />

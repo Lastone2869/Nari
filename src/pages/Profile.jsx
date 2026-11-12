@@ -1,27 +1,28 @@
 // src/pages/Profile.jsx
 import { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { User, Mail, Phone, Shield, FileText, Lock, LogOut, AlertCircle, CheckCircle } from 'lucide-react';
-import { useAuth } from '../context/AuthContext';
+import { User, Mail, Phone, FileText, Lock, LogOut, AlertCircle, CheckCircle } from 'lucide-react';
+import { useAuth } from '../context/useAuth';
 import { logout } from '../firebase/auth';
 import { getUserReports } from '../firebase/firestore';
-import { doc, getDoc, updateDoc } from 'firebase/firestore';
+import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { db } from '../firebase/config';
 
 export default function Profile() {
-  const { user, loading } = useAuth();
+  const { user } = useAuth();
   const navigate = useNavigate();
   const [reports, setReports] = useState([]);
   const [profile, setProfile] = useState({ name: '', phone: '' });
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [error, setError] = useState('');
 
   useEffect(() => {
     if (!user) return;
     // Load user profile
-    getDoc(doc(db, 'users', user.uid)).then((snap) => {
-      if (snap.exists()) setProfile({ name: snap.data().name || '', phone: snap.data().phone || '' });
-    });
+    getDoc(doc(db, 'users', user.uid))
+      .then((snap) => { if (snap.exists()) setProfile({ name: snap.data().name || '', phone: snap.data().phone || '' }); })
+      .catch((e) => console.error('Profile load failed', e));
     // Load reports
     return getUserReports(user.uid, setReports);
   }, [user]);
@@ -29,26 +30,26 @@ export default function Profile() {
   const saveProfile = async () => {
     if (!user) return;
     setSaving(true);
-    await updateDoc(doc(db, 'users', user.uid), { name: profile.name, phone: profile.phone });
-    setSaving(false); setSaved(true);
-    setTimeout(() => setSaved(false), 2000);
+    setError('');
+    try {
+      // merge: the profile doc may not exist if registration was interrupted
+      await setDoc(doc(db, 'users', user.uid), { name: profile.name.trim(), phone: profile.phone.trim() }, { merge: true });
+      setSaved(true);
+      setTimeout(() => setSaved(false), 2000);
+    } catch (e) {
+      console.error('Profile save failed', e);
+      setError('Could not save your profile. Please try again.');
+    } finally {
+      setSaving(false);
+    }
   };
 
   const handleLogout = async () => { await logout(); navigate('/login'); };
 
-  if (loading) return <div className="min-h-screen flex items-center justify-center"><div className="w-10 h-10 border-2 border-violet-600 border-t-transparent rounded-full animate-spin" /></div>;
-  if (!user) return <div className="min-h-screen flex items-center justify-center px-4 pt-20">
-    <div className="glass-card rounded-2xl p-8 text-center max-w-sm shadow-sm border border-nari-navy/10">
-      <Shield size={28} className="text-nari-navy mx-auto mb-3" />
-      <p className="text-nari-navy font-bold mb-3">Please sign in to view your profile</p>
-      <Link to="/login" className="px-6 py-2.5 rounded-xl bg-nari-navy text-white font-bold hover:bg-[#132846] transition-colors shadow-md">Sign In</Link>
-    </div>
-  </div>;
-
   const isAnon = user.isAnonymous;
 
   return (
-    <div className="min-h-screen pt-20 pb-10 px-4 grid-bg">
+    <div className="min-h-screen pt-20 pb-10 px-4">
       <div className="max-w-3xl mx-auto">
         <h1 className="font-display text-3xl font-bold text-nari-navy mb-8">My Profile</h1>
 
@@ -105,7 +106,7 @@ export default function Profile() {
                 </h2>
                 <div className="space-y-4">
                   <div>
-                    <label className="text-xs text-gray-500 font-bold mb-1 block uppercase tracking-wider">Name</label>
+                    <label htmlFor="profile-name" className="text-xs text-gray-500 font-bold mb-1 block uppercase tracking-wider">Name</label>
                     <input
                       id="profile-name"
                       type="text"
@@ -123,7 +124,7 @@ export default function Profile() {
                     </div>
                   </div>
                   <div>
-                    <label className="text-xs text-gray-500 font-bold mb-1 block uppercase tracking-wider">Phone</label>
+                    <label htmlFor="profile-phone" className="text-xs text-gray-500 font-bold mb-1 block uppercase tracking-wider">Phone</label>
                     <div className="relative">
                       <Phone size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
                       <input
@@ -144,6 +145,7 @@ export default function Profile() {
                   >
                     {saved ? <><CheckCircle size={15} />Saved!</> : saving ? 'Saving…' : 'Save Changes'}
                   </button>
+                  {error && <p role="alert" className="text-sm font-semibold text-red-600">{error}</p>}
                 </div>
               </div>
             )}

@@ -4,7 +4,6 @@ import { Users, FileText, AlertTriangle, ShieldCheck } from 'lucide-react';
 
 export default function AdminDashboard() {
   const [counts, setCounts] = useState({ users: 0, reports: 0, verifiedReports: 0, activeAlerts: 0 });
-  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     let unsubs = [];
@@ -23,7 +22,6 @@ export default function AdminDashboard() {
 
     unsubs.push(subscribeToLiveAlertsAdmin((alerts) => {
       setCounts(prev => ({ ...prev, activeAlerts: alerts.length }));
-      setLoading(false); // Assume done when alerts load
     }));
 
     return () => unsubs.forEach(unsub => unsub());
@@ -35,8 +33,6 @@ export default function AdminDashboard() {
     { title: 'Verified Incidents', value: counts.verifiedReports, icon: ShieldCheck, color: 'text-emerald-600', bg: 'bg-emerald-50' },
     { title: 'Live SOS Alerts', value: counts.activeAlerts, icon: AlertTriangle, color: 'text-red-600', bg: 'bg-red-50', pulse: true },
   ];
-
-  if (loading) return <div className="text-gray-500 font-bold p-8">Loading Telemetry...</div>;
 
   return (
     <div className="space-y-6">
@@ -62,18 +58,6 @@ export default function AdminDashboard() {
             </div>
           </div>
         ))}
-      </div>
-
-      {/* Feature placeholder for charts */}
-      <div className="grid lg:grid-cols-2 gap-6 mt-8">
-        <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 h-64 flex flex-col justify-center items-center text-gray-400">
-          <div className="text-lg font-bold">Activity Heatmap</div>
-          <p className="text-sm">ChartJS / Recharts integration pending</p>
-        </div>
-        <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 h-64 flex flex-col justify-center items-center text-gray-400">
-          <div className="text-lg font-bold">Registration Trends</div>
-          <p className="text-sm">ChartJS / Recharts integration pending</p>
-        </div>
       </div>
     </div>
   );

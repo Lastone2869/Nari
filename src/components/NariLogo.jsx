@@ -1,0 +1,34 @@
+export default function NariLogo({ size = 40, className = '' }) {
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 100 100"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      className={className}
+      aria-hidden="true"
+    >
+      <defs>
+        <linearGradient id="nari-swoop" x1="18" y1="20" x2="78" y2="82" gradientUnits="userSpaceOnUse">
+          <stop stopColor="#1A365D" />
+          <stop offset="1" stopColor="#0F2743" />
+        </linearGradient>
+        <linearGradient id="nari-glow" x1="36" y1="28" x2="73" y2="73" gradientUnits="userSpaceOnUse">
+          <stop stopColor="#FFB020" />
+          <stop offset="1" stopColor="#FF6B6B" />
+        </linearGradient>
+      </defs>
+
+      <path
+        d="M20 28C35 16 59 16 75 28C84 35 88 47 86 58C80 47 69 40 54 38C41 36 29 39 20 47V28Z"
+        fill="url(#nari-swoop)"
+      />
+      <path
+        d="M33 35C38 49 45 61 55 71C63 65 69 57 72 46C68 52 62 56 55 57C47 58 40 54 36 47C34 44 33 40 33 35Z"
+        fill="url(#nari-glow)"
+      />
+      <circle cx="43" cy="42" r="4.5" fill="#FFF4DA" />
+    </svg>
+  );
+}

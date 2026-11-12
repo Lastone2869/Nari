@@ -1,16 +1,12 @@
 // src/context/AuthContext.jsx
-import { createContext, useContext, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { onAuth } from '../firebase/auth';
-
-const AuthContext = createContext(null);
+import { AuthContext } from './useAuth';
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(undefined); // undefined = loading
 
-  useEffect(() => {
-    const unsub = onAuth((u) => setUser(u));
-    return unsub;
-  }, []);
+  useEffect(() => onAuth(setUser), []);
 
   return (
     <AuthContext.Provider value={{ user, loading: user === undefined }}>
@@ -18,5 +14,3 @@ export const AuthProvider = ({ children }) => {
     </AuthContext.Provider>
   );
 };
-
-export const useAuth = () => useContext(AuthContext);

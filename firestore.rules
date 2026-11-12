@@ -1,0 +1,59 @@
+rules_version = '2';
+
+// Deploy with: firebase deploy --only firestore:rules
+// Bootstrapping: set `role: "admin"` on your own users/{uid} document in the
+// Firebase console once. Clients can never grant themselves that field.
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signedIn() {
+      return request.auth != null;
+    }
+    function isOwner(uid) {
+      return signedIn() && request.auth.uid == uid;
+    }
+    function isAdmin() {
+      return signedIn()
+        && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+    }
+
+    match /users/{uid} {
+      allow read: if isOwner(uid) || isAdmin();
+      allow create: if isOwner(uid) && !('role' in request.resource.data);
+      allow update: if isAdmin()
+        || (isOwner(uid) && !request.resource.data.diff(resource.data).affectedKeys().hasAny(['role']));
+      allow delete: if isAdmin();
+    }
+
+    // Reports feed the public safety map and the track-by-ID page, so they are world readable.
+    // Non-anonymous reports expose the reporter's uid; see README "Known limitations".
+    match /reports/{id} {
+      allow read: if true;
+      allow create: if signedIn()
+        && request.resource.data.userId in [request.auth.uid, 'anonymous']
+        && request.resource.data.status == 'pending'
+        && request.resource.data.type is string
+        && request.resource.data.description is string
+        && request.resource.data.description.size() <= 2000;
+      allow update, delete: if isAdmin();
+    }
+
+    match /evidence/{id} {
+      allow read: if isOwner(resource.data.userId) || isAdmin();
+      allow create: if isOwner(request.resource.data.userId);
+      allow update: if false;
+      allow delete: if isAdmin();
+    }
+
+    match /alerts/{id} {
+      allow read: if isOwner(resource.data.userId) || isAdmin();
+      allow create: if isOwner(request.resource.data.userId);
+      allow update: if isOwner(resource.data.userId) || isAdmin();
+      allow delete: if isAdmin();
+    }
+
+    match /safe_spaces/{id} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+  }
+}

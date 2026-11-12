@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { getAllReportsAdmin, updateReportStatus, deleteReportAdmin } from '../../firebase/firestore';
-import { CheckCircle, XCircle, Trash2, Search } from 'lucide-react';
+import { Trash2 } from 'lucide-react';
+import { REPORT_STATUSES } from '../../lib/reportStatus';
 
 export default function AdminReports() {
   const [reports, setReports] = useState([]);
@@ -11,8 +12,12 @@ export default function AdminReports() {
     return unsub;
   }, []);
 
-  const handleVerify = async (id) => updateReportStatus(id, 'verified');
-  const handleReject = async (id) => deleteReportAdmin(id);
+  const handleStatus = (id, status) =>
+    updateReportStatus(id, status).catch((e) => { console.error(e); alert('Status update failed.'); });
+  const handleDelete = (id) => {
+    if (!window.confirm('Permanently delete this report? This cannot be undone.')) return;
+    deleteReportAdmin(id).catch((e) => { console.error(e); alert('Delete failed.'); });
+  };
 
   const filtered = filter === 'all' ? reports : reports.filter(r => r.status === filter);
 
@@ -33,6 +38,10 @@ export default function AdminReports() {
             className={`px-4 py-2 border-l border-gray-200 ${filter === 'verified' ? 'bg-emerald-500 text-white' : 'text-gray-500 hover:bg-gray-50'}`} 
             onClick={() => setFilter('verified')}>Verified
           </button>
+          <button
+            className={`px-4 py-2 border-l border-gray-200 ${filter === 'resolved' ? 'bg-nari-navy text-white' : 'text-gray-500 hover:bg-gray-50'}`}
+            onClick={() => setFilter('resolved')}>Resolved
+          </button>
         </div>
       </div>
 
@@ -51,29 +60,29 @@ export default function AdminReports() {
             {filtered.map(r => (
               <tr key={r.id} className="hover:bg-gray-50 transition-colors">
                 <td className="p-4">
-                  <div className="font-bold text-nari-navy capitalize">{r.type.replace('_', ' ')}</div>
+                  <div className="font-bold text-nari-navy capitalize">{r.type?.replace('_', ' ') || 'Unknown'}</div>
                   <div className="text-xs text-gray-500 max-w-xs truncate">{r.description || 'No description provided'}</div>
                 </td>
                 <td className="p-4 text-sm text-gray-600 font-medium">
                   {r.locationLabel || 'GPS Coordinates'}
                 </td>
                 <td className="p-4 text-sm text-gray-500">
-                  {new Date(r.createdAt?.toDate?.() || Date.now()).toLocaleDateString()}
+                  {r.createdAt?.toDate?.().toLocaleDateString() ?? 'Just now'}
                 </td>
                 <td className="p-4 text-center">
-                  <span className={`px-3 py-1 text-xs font-bold rounded-full ${
-                    r.status === 'verified' ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'
-                  }`}>
-                    {r.status.toUpperCase()}
-                  </span>
+                  <select
+                    aria-label="Report status"
+                    value={REPORT_STATUSES.includes(r.status) ? r.status : 'pending'}
+                    onChange={(e) => handleStatus(r.id, e.target.value)}
+                    className={`rounded-full border-0 px-3 py-1 text-xs font-bold uppercase ${
+                      r.status === 'pending' ? 'bg-amber-100 text-amber-700' : r.status === 'resolved' || r.status === 'closed' ? 'bg-nari-navy/10 text-nari-navy' : 'bg-emerald-100 text-emerald-700'
+                    }`}
+                  >
+                    {REPORT_STATUSES.map((s) => <option key={s} value={s}>{s}</option>)}
+                  </select>
                 </td>
-                <td className="p-4 text-right flex items-center justify-end gap-2">
-                  {r.status === 'pending' && (
-                    <button onClick={() => handleVerify(r.id)} className="p-2 bg-emerald-50 text-emerald-600 rounded-lg hover:bg-emerald-100 transition" title="Verify Report">
-                      <CheckCircle size={18} />
-                    </button>
-                  )}
-                  <button onClick={() => handleReject(r.id)} className="p-2 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 transition" title="Delete/Reject Report">
+                <td className="p-4 text-right">
+                  <button onClick={() => handleDelete(r.id)} className="p-2 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 transition" title="Delete Report" aria-label="Delete report">
                     <Trash2 size={18} />
                   </button>
                 </td>

@@ -14,16 +14,18 @@ import { auth, db } from './config';
 
 const googleProvider = new GoogleAuthProvider();
 
+const newProfile = (name, email) => ({
+  name,
+  email,
+  phone: '',
+  trustedContacts: [],
+  createdAt: serverTimestamp(),
+});
+
 export const registerWithEmail = async (email, password, name) => {
   const cred = await createUserWithEmailAndPassword(auth, email, password);
   await updateProfile(cred.user, { displayName: name });
-  await setDoc(doc(db, 'users', cred.user.uid), {
-    name,
-    email,
-    phone: '',
-    trustedContacts: [],
-    createdAt: serverTimestamp(),
-  });
+  await setDoc(doc(db, 'users', cred.user.uid), newProfile(name, email));
   return cred.user;
 };
 
@@ -35,32 +37,16 @@ export const loginWithGoogle = async () => {
   const userRef = doc(db, 'users', cred.user.uid);
   const snap = await getDoc(userRef);
   if (!snap.exists()) {
-    await setDoc(userRef, {
-      name: cred.user.displayName || 'User',
-      email: cred.user.email,
-      phone: '',
-      trustedContacts: [],
-      createdAt: serverTimestamp(),
-    });
+    await setDoc(userRef, newProfile(cred.user.displayName || 'User', cred.user.email));
   }
   return cred.user;
 };
 
 export const loginAnonymously = () => signInAnonymously(auth);
 
-// [Admin Testing Bailout]
-export const loginAsMagicAdmin = async () => {
-  const cred = await signInAnonymously(auth);
-  await setDoc(doc(db, 'users', cred.user.uid), {
-    name: 'Magic Admin',
-    email: 'admin@nari.local',
-    phone: '000-000-0000',
-    trustedContacts: [],
-    role: 'admin',
-    createdAt: serverTimestamp(),
-  });
-  return cred.user;
-};
+/** Current user, or a fresh anonymous session so SOS and reports work without an account. */
+export const ensureSignedIn = async () =>
+  auth.currentUser ?? (await signInAnonymously(auth)).user;
 
 export const logout = () => signOut(auth);
 

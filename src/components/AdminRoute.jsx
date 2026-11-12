@@ -1,35 +1,28 @@
 import { useEffect, useState } from 'react';
-import { Navigate } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from '../context/useAuth';
 import { doc, getDoc } from 'firebase/firestore';
 import { db } from '../firebase/config';
 import { ShieldAlert } from 'lucide-react';
 
 export default function AdminRoute({ children }) {
   const { user, loading: authLoading } = useAuth();
-  const [isAdmin, setIsAdmin] = useState(false);
-  const [verifying, setVerifying] = useState(true);
+  // Role check result keyed by uid, so a new sign-in never reuses the previous user's answer.
+  const [check, setCheck] = useState({ uid: null, isAdmin: false });
 
   useEffect(() => {
-    if (!user) {
-      if (!authLoading) setVerifying(false);
-      return;
-    }
+    if (!user) return;
+    let active = true;
+    getDoc(doc(db, 'users', user.uid))
+      .then((snap) => active && setCheck({ uid: user.uid, isAdmin: snap.exists() && snap.data().role === 'admin' }))
+      .catch((e) => {
+        console.error('Admin check failed', e);
+        if (active) setCheck({ uid: user.uid, isAdmin: false });
+      });
+    return () => { active = false; };
+  }, [user]);
 
-    const checkRole = async () => {
-      try {
-        const snap = await getDoc(doc(db, 'users', user.uid));
-        if (snap.exists() && snap.data().role === 'admin') {
-          setIsAdmin(true);
-        }
-      } catch (e) {
-        console.error("Admin check failed", e);
-      } finally {
-        setVerifying(false);
-      }
-    };
-    checkRole();
-  }, [user, authLoading]);
+  const verifying = !!user && check.uid !== user.uid;
+  const isAdmin = !!user && check.uid === user.uid && check.isAdmin;
 
   if (authLoading || verifying) {
     return (

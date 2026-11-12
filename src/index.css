@@ -1,5 +1,7 @@
 @import "tailwindcss";
 
+/* Brand tokens. @theme registers them as utilities (bg-nari-navy, text-nari-coral, font-display…)
+   and also emits them on :root for plain CSS below. */
 @theme {
   --color-nari-navy: #1A365D;
   --color-nari-amber: #FFB020;
@@ -11,25 +13,33 @@
   --font-display: 'Inter', system-ui, sans-serif;
 }
 
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
-
 html {
   scroll-behavior: smooth;
 }
 
 body {
   font-family: var(--font-sans);
-  background-color: var(--color-nari-pearl);
+  background:
+    radial-gradient(circle at top right, rgba(79, 209, 197, 0.08), transparent 26%),
+    radial-gradient(circle at top left, rgba(255, 176, 32, 0.08), transparent 24%),
+    var(--color-nari-pearl);
   color: var(--color-nari-navy);
   min-height: 100vh;
   overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
 }
 
-/* Light Theme Glassmorphism */
+:focus-visible {
+  outline: 3px solid rgba(79, 209, 197, 0.35);
+  outline-offset: 3px;
+}
+
+::selection {
+  background: rgba(79, 209, 197, 0.22);
+  color: var(--color-nari-navy);
+}
+
 .glass {
   background: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(8px);
@@ -51,61 +61,28 @@ body {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
   transition: box-shadow 0.2s ease, transform 0.2s ease;
 }
+
 .zomato-card:hover {
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
   transform: translateY(-2px);
 }
 
-/* Gradient text */
-.gradient-text {
-  background: linear-gradient(135deg, var(--color-nari-navy) 0%, var(--color-nari-teal) 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
-.gradient-text-gold {
-  background: linear-gradient(135deg, var(--color-nari-amber) 0%, var(--color-nari-coral) 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
-/* Glow effects */
-.glow-navy {
-  box-shadow: 0 0 20px rgba(26, 54, 93, 0.2), 0 0 40px rgba(26, 54, 93, 0.05);
-}
-
-.glow-coral {
-  box-shadow: 0 0 20px rgba(255, 107, 107, 0.4), 0 0 40px rgba(255, 107, 107, 0.1);
-}
-
-.glow-amber {
-  box-shadow: 0 0 25px rgba(255, 176, 32, 0.4), 0 0 50px rgba(255, 176, 32, 0.15);
-}
-
-/* Custom scrollbar */
 ::-webkit-scrollbar {
   width: 6px;
 }
+
 ::-webkit-scrollbar-track {
   background: var(--color-nari-pearl);
 }
+
 ::-webkit-scrollbar-thumb {
-  background: var(--color-nari-navy);
+  background: rgba(26, 54, 93, 0.5);
   border-radius: 3px;
-  opacity: 0.5;
 }
 
-/* Animations */
 @keyframes float {
-  0%, 100% { transform: translateY(0px); }
+  0%, 100% { transform: translateY(0); }
   50% { transform: translateY(-10px); }
-}
-
-@keyframes pulse-glow {
-  0%, 100% { box-shadow: 0 0 20px rgba(255, 107, 107, 0.3); }
-  50% { box-shadow: 0 0 40px rgba(255, 107, 107, 0.6), 0 0 60px rgba(255, 107, 107, 0.2); }
 }
 
 @keyframes slide-up {
@@ -118,38 +95,42 @@ body {
   to { opacity: 1; }
 }
 
-@keyframes shimmer {
-  0% { background-position: -200px 0; }
-  100% { background-position: 200px 0; }
+.animate-float {
+  animation: float 6s ease-in-out infinite;
 }
 
-.animate-float { animation: float 6s ease-in-out infinite; }
-.animate-pulse-glow { animation: pulse-glow 2s ease-in-out infinite; }
-.animate-slide-up { animation: slide-up 0.6s ease-out forwards; }
-.animate-fade-in { animation: fade-in 0.5s ease-out forwards; }
-
-/* Grid background (Light mode version) */
-.grid-bg {
-  /* Removed grid pattern as per UCD plan */
-  background-color: var(--color-nari-pearl);
+.animate-slide-up {
+  animation: slide-up 0.6s ease-out forwards;
 }
 
-/* Status badges optimized for readability on light backgrounds */
-.badge-pending { background: rgba(255, 176, 32, 0.15); color: #B47A00; border: 1px solid rgba(255, 176, 32, 0.3); } /* amber */
-.badge-verified { background: rgba(79, 209, 197, 0.15); color: #0C857B; border: 1px solid rgba(79, 209, 197, 0.3); } /* teal */
-.badge-resolved { background: rgba(26, 54, 93, 0.1); color: var(--color-nari-navy); border: 1px solid rgba(26, 54, 93, 0.2); } /* navy */
-.badge-active { background: rgba(255, 107, 107, 0.15); color: #CC3333; border: 1px solid rgba(255, 107, 107, 0.3); } /* coral */
-
-/* Map container */
-.map-container {
-  width: 100%;
-  height: 500px;
-  border-radius: 1rem;
-  overflow: hidden;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+.animate-fade-in {
+  animation: fade-in 0.5s ease-out forwards;
 }
 
-/* Form styles for light theme */
+@media (prefers-reduced-motion: reduce) {
+  .animate-float, .animate-slide-up, .animate-fade-in, .animate-pulse, .animate-ping, .animate-bounce {
+    animation: none;
+  }
+}
+
+.badge-pending {
+  background: rgba(255, 176, 32, 0.15);
+  color: #B47A00;
+  border: 1px solid rgba(255, 176, 32, 0.3);
+}
+
+.badge-verified {
+  background: rgba(79, 209, 197, 0.15);
+  color: #0C857B;
+  border: 1px solid rgba(79, 209, 197, 0.3);
+}
+
+.badge-resolved {
+  background: rgba(26, 54, 93, 0.1);
+  color: var(--color-nari-navy);
+  border: 1px solid rgba(26, 54, 93, 0.2);
+}
+
 .nari-input {
   width: 100%;
   background: #F8F9FA;
@@ -157,7 +138,6 @@ body {
   border-radius: 1rem;
   padding: 1rem 1.25rem;
   color: var(--color-nari-navy);
-  font-family: var(--font-sans);
   font-size: 1rem;
   font-weight: 500;
   transition: all 0.2s;
@@ -173,30 +153,12 @@ body {
   color: rgba(26, 54, 93, 0.4);
 }
 
-.nari-input option {
-  background: white;
-  color: var(--color-nari-navy);
-}
-
-/* Page transition */
-.page-enter {
-  opacity: 0;
-  transform: translateY(20px);
-}
-.page-enter-active {
-  opacity: 1;
-  transform: translateY(0);
-  transition: opacity 300ms, transform 300ms;
-}
-
-/* Subtle noise overlay (lightened for pearl background) */
 .noise::before {
   content: '';
   position: fixed;
-  top: 0; left: 0;
-  width: 100%; height: 100%;
+  inset: 0;
   opacity: 0.02;
   pointer-events: none;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
-  z-index: 9999;
+  z-index: -1;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
 }

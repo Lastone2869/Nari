@@ -1,9 +1,9 @@
-// src/components/Navbar.jsx
 import { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Shield, Menu, X, AlertCircle, User, LogOut, MapPin, FileText, Lock } from 'lucide-react';
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from '../context/useAuth';
 import { logout } from '../firebase/auth';
+import NariLogo from './NariLogo';
 
 const links = [
   { to: '/', label: 'Home', icon: Shield },
@@ -26,33 +26,29 @@ export default function Navbar() {
   if (location.pathname.startsWith('/admin')) return null;
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-md shadow-sm border-b border-gray-100">
-      <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
-        {/* Logo */}
-        <Link to="/" className="flex items-center gap-2 group">
-          <div className="flex items-center justify-center group-hover:scale-110 transition-transform">
-             <svg width="40" height="40" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-              {/* Upper purple curve */}
-              <path d="M 25 25 C 50 15, 80 20, 85 45 C 80 30, 50 25, 25 25 Z" fill="#7C3AED" />
-              {/* Lower light purple face curve */}
-              <path d="M 30 35 C 35 55, 40 60, 50 70 C 60 60, 65 55, 65 45 L 60 55 C 50 65, 45 60, 40 45 C 45 45, 45 40, 40 40 C 40 38, 42 35, 30 35 Z" fill="#A78BFA" />
-            </svg>
+    <nav className="fixed left-0 right-0 top-0 z-50 border-b border-nari-navy/10 bg-white/90 shadow-[0_10px_30px_rgba(15,39,67,0.06)] backdrop-blur-xl">
+      <div className="mx-auto grid h-[4.5rem] w-full max-w-7xl grid-cols-[auto_1fr_auto] items-center gap-4 px-4 sm:px-6 lg:px-8">
+        <Link to="/" className="flex items-center gap-2.5">
+          <NariLogo size={42} />
+          <div className="leading-none">
+            <span className="block font-display text-xl font-black tracking-[0.22em] text-nari-navy sm:text-2xl">NARI</span>
+            <span className="hidden text-[11px] font-semibold uppercase tracking-[0.3em] text-nari-navy/45 sm:block">
+              Safety OS
+            </span>
           </div>
-          <span className="font-display text-2xl font-bold gradient-text -ml-2">NARI</span>
         </Link>
 
-        {/* Desktop Nav - Centered */}
-        <div className="hidden md:flex items-center gap-6 absolute left-1/2 -translate-x-1/2">
+        <div className="hidden items-center justify-center gap-2 md:flex">
           {links.map(({ to, label }) => {
             const active = location.pathname === to;
             return (
               <Link
                 key={to}
                 to={to}
-                className={`text-sm font-bold transition-all border-b-2 py-1 ${
+                className={`rounded-full px-4 py-2 text-sm font-bold transition-all ${
                   active
-                    ? 'border-nari-navy text-nari-navy'
-                    : 'border-transparent text-gray-400 hover:text-nari-navy hover:border-gray-200'
+                    ? 'bg-nari-navy text-white shadow-sm'
+                    : 'text-gray-500 hover:bg-nari-navy/5 hover:text-nari-navy'
                 }`}
               >
                 {label}
@@ -61,91 +57,98 @@ export default function Navbar() {
           })}
         </div>
 
-        {/* Right actions */}
-        <div className="hidden md:flex items-center gap-3">
+        <div className="hidden items-center gap-3 md:flex">
           <Link
             to="/report"
-            className="inline-flex items-center justify-center gap-1.5 h-10 px-4 rounded-xl bg-nari-coral text-white text-sm font-bold whitespace-nowrap animate-pulse-glow hover:bg-[#e55353] transition-colors shadow-md flex-shrink-0"
+            className="inline-flex h-11 flex-shrink-0 items-center justify-center gap-1.5 rounded-2xl bg-nari-coral px-4 text-sm font-bold whitespace-nowrap text-white shadow-md transition-all hover:-translate-y-0.5 hover:bg-[#e55353]"
           >
             <AlertCircle size={15} />
-            SOS
+            Quick SOS
           </Link>
           {user ? (
             <div className="flex items-center gap-2">
               <Link
                 to="/profile"
-                className="w-8 h-8 rounded-full bg-nari-navy/10 border border-nari-navy/20 flex items-center justify-center hover:bg-nari-navy/20 transition-colors"
+                aria-label="My profile"
+                className="flex h-10 w-10 items-center justify-center rounded-full border border-nari-navy/15 bg-nari-navy/5 transition-colors hover:bg-nari-navy/10"
               >
-                <User size={15} className="text-nari-navy" />
+                <User size={16} className="text-nari-navy" />
               </Link>
               <button
                 onClick={handleLogout}
-                className="w-8 h-8 rounded-full bg-white border border-nari-navy/10 flex items-center justify-center hover:bg-nari-coral/10 hover:border-nari-coral/30 transition-colors"
+                aria-label="Sign out"
+                className="flex h-10 w-10 items-center justify-center rounded-full border border-nari-navy/10 bg-white transition-colors hover:border-nari-coral/30 hover:bg-nari-coral/10"
               >
-                <LogOut size={14} className="text-gray-500 hover:text-nari-coral" />
+                <LogOut size={15} className="text-gray-500" />
               </button>
             </div>
           ) : (
             <Link
               to="/login"
-              className="inline-flex items-center justify-center h-10 px-5 rounded-xl bg-nari-navy text-white text-sm font-bold whitespace-nowrap hover:bg-[#132846] transition-colors shadow-sm flex-shrink-0"
+              className="inline-flex h-11 flex-shrink-0 items-center justify-center rounded-2xl bg-nari-navy px-5 text-sm font-bold whitespace-nowrap text-white shadow-sm transition-colors hover:bg-[#132846]"
             >
               Sign In
             </Link>
           )}
         </div>
 
-        {/* Mobile hamburger */}
         <button
-          className="md:hidden text-gray-500 hover:text-nari-navy transition-colors"
+          className="flex h-10 w-10 items-center justify-center rounded-full border border-nari-navy/10 bg-white text-gray-500 transition-colors hover:text-nari-navy md:hidden"
           onClick={() => setOpen(!open)}
+          aria-label={open ? 'Close menu' : 'Open menu'}
+          aria-expanded={open}
         >
           {open ? <X size={22} /> : <Menu size={22} />}
         </button>
       </div>
 
-      {/* Mobile menu */}
       {open && (
-        <div className="md:hidden glass border-t border-nari-navy/10 px-4 pt-3 pb-4 space-y-1 animate-slide-up">
-          {links.map(({ to, label, icon: Icon }) => (
-            <Link
-              key={to}
-              to={to}
-              onClick={() => setOpen(false)}
-              className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
-                location.pathname === to
-                  ? 'bg-nari-navy/10 text-nari-navy'
-                  : 'text-gray-500 hover:text-nari-navy'
-              }`}
-            >
-              <Icon size={15} />
-              {label}
-            </Link>
-          ))}
-          <div className="pt-2 flex gap-2">
-            <Link
-              to="/report"
-              onClick={() => setOpen(false)}
-              className="flex-1 flex items-center justify-center gap-1 py-2 rounded-xl bg-nari-coral text-white text-sm font-semibold"
-            >
-              <AlertCircle size={14} /> SOS
-            </Link>
-            {user ? (
-              <button
-                onClick={handleLogout}
-                className="flex-1 py-2 rounded-xl bg-white border border-nari-navy/10 text-gray-600 text-sm"
-              >
-                Sign Out
-              </button>
-            ) : (
+        <div className="glass animate-slide-up border-t border-nari-navy/10 px-4 pb-5 pt-3 md:hidden">
+          <div className="space-y-1 rounded-2xl bg-white/80 p-2 shadow-sm">
+            {links.map(({ to, label, icon: Icon }) => (
               <Link
-                to="/login"
+                key={to}
+                to={to}
                 onClick={() => setOpen(false)}
-                className="flex-1 text-center py-2 rounded-xl bg-nari-navy text-white text-sm font-semibold"
+                className={`flex items-center gap-3 rounded-xl px-3 py-3 text-sm font-medium transition-colors ${
+                  location.pathname === to
+                    ? 'bg-nari-navy text-white'
+                    : 'text-gray-600 hover:bg-nari-navy/5 hover:text-nari-navy'
+                }`}
               >
-                Sign In
+                <Icon size={15} />
+                {label}
               </Link>
-            )}
+            ))}
+            <div className="flex gap-2 px-1 pt-3">
+              <Link
+                to="/report"
+                onClick={() => setOpen(false)}
+                className="flex flex-1 items-center justify-center gap-1 rounded-xl bg-nari-coral py-3 text-sm font-semibold text-white"
+              >
+                <AlertCircle size={14} />
+                SOS
+              </Link>
+              {user ? (
+                <button
+                  onClick={() => {
+                    setOpen(false);
+                    handleLogout();
+                  }}
+                  className="flex-1 rounded-xl border border-nari-navy/10 bg-white py-3 text-sm text-gray-600"
+                >
+                  Sign Out
+                </button>
+              ) : (
+                <Link
+                  to="/login"
+                  onClick={() => setOpen(false)}
+                  className="flex-1 rounded-xl bg-nari-navy py-3 text-center text-sm font-semibold text-white"
+                >
+                  Sign In
+                </Link>
+              )}
+            </div>
           </div>
         </div>
       )}
