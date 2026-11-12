@@ -16,6 +16,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { ensureSignedIn } from '../firebase/auth';
 import { startLiveAlert, updateLiveAlertLocation, resolveLiveAlert } from '../firebase/firestore';
 import { sosSession } from '../lib/sosSession';
+import { saveFile, SAVE_PLACE } from '../lib/saveFile';
 
 const HOLD_DURATION = 3000;
 const PING_INTERVAL = 10000;
@@ -160,7 +161,7 @@ export default function Home() {
     if (running) {
       running.addEventListener('stop', () => {
         setRecording(false);
-        showToast(`${LABELS[kind]} saved to your downloads`, 'success');
+        showToast(`${LABELS[kind]} saved to ${SAVE_PLACE}`, 'success');
       }, { once: true });
       running.stop();
       return;
@@ -173,10 +174,10 @@ export default function Home() {
         if (e.data.size > 0) chunks.push(e.data);
       };
       recorder.onstop = () => {
-        const url = URL.createObjectURL(new Blob(chunks, { type: `${kind}/webm` }));
-        const a = Object.assign(document.createElement('a'), { href: url, download: `nari_${kind}_${Date.now()}.webm` });
-        a.click();
-        setTimeout(() => URL.revokeObjectURL(url), 10000); // let the download start before freeing the blob
+        saveFile(new Blob(chunks, { type: `${kind}/webm` }), `nari_${kind}_${Date.now()}.webm`).catch((e) => {
+          console.error('Saving the recording failed', e);
+          alert('The recording could not be saved.'); // evidence was lost, so this must not be silent
+        });
         stream.getTracks().forEach((t) => t.stop());
         sosSession[key] = null;
       };
@@ -345,7 +346,7 @@ export default function Home() {
                   active={audioRecording}
                   onClick={() => toggleRecording('audio', setAudioRecording)}
                   title={audioRecording ? 'Stop audio' : 'Record audio'}
-                  hint={audioRecording ? 'Recording. Tap to stop and save.' : 'Saves to your downloads when you stop.'}
+                  hint={audioRecording ? 'Recording. Tap to stop and save.' : `Saves to ${SAVE_PLACE} when you stop.`}
                 />
                 <ActionTile
                   icon={Video}
@@ -408,7 +409,7 @@ export default function Home() {
         </div>
 
         <p className="mt-8 max-w-2xl text-[13px] leading-5 text-gray-600">
-          Add NARI to your home screen for one-tap access. Recording and live alerts keep running while you switch pages, but stop if the browser tab is closed.
+          Recording and live alerts keep running while you switch pages, but stop if you close NARI.
         </p>
       </div>
 

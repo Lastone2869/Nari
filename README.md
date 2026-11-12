@@ -28,6 +28,30 @@ curl -X PATCH -H "Authorization: Bearer owner" -H "Content-Type: application/jso
 
 Full results of the last test round are in `docs/TEST_REPORT.md`.
 
+## Android app
+
+The Android app is the same web app inside a native shell ([Capacitor](https://capacitorjs.com)). There is one codebase: change the React code, then re-sync. The native project lives in `android/`.
+
+**Get an APK without installing anything.** Every push to `main` runs the "Android APK" workflow on GitHub Actions. Open the run, download the `nari-debug-apk` artifact, unzip it, and install `app-debug.apk` on a phone (allow "install unknown apps" for your file manager or browser).
+
+**Build locally.** Needs [Android Studio](https://developer.android.com/studio) (it brings the SDK and a suitable JDK; the system JDK 25 is too new for this Gradle version).
+
+```bash
+npm run android:sync   # build the web app and copy it into android/
+npm run android:open   # open the project in Android Studio, then press Run
+```
+
+What differs from the website:
+
+| Area | In the app |
+|---|---|
+| Recordings | Saved to `Documents/NARI` on the phone instead of the browser's downloads |
+| Google sign-in | Hidden, because Google blocks its sign-in popup inside embedded browsers. Email and anonymous sign-in work |
+| Permissions | Location, camera and microphone are requested the first time each feature is used |
+| Floating SOS button, Call 112 | Open the phone dialer |
+
+Not included yet: a signed release build for the Play Store (create a keystore and a `release` signing config), native Google sign-in (needs `@capacitor-firebase/authentication` and a `google-services.json`), and location updates while the app is in the background (needs a foreground service). The app id is `com.nari.safetyos` in `capacitor.config.json` and `android/app/build.gradle`; change both before publishing if you want a different one.
+
 ## Firebase setup (required once)
 
 1. Enable **Email/Password**, **Google** and **Anonymous** sign-in in Firebase Auth. Anonymous sign-in is used automatically so SOS and reports work without an account.
