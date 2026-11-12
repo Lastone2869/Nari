@@ -98,6 +98,7 @@ export default function AdminUsers() {
                               : 'bg-blue-50 text-blue-600 hover:bg-blue-100'
                           }`}
                           title="Toggle Admin Privilege"
+                          aria-label="Toggle admin privilege"
                         >
                           {u.role === 'admin' ? <ShieldAlert size={18} /> : <Shield size={18} />}
                         </button>
@@ -105,7 +106,8 @@ export default function AdminUsers() {
                         <button
                           onClick={() => requestDelete(u.id)}
                           className="p-2 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 transition"
-                          title="Delete User"
+                          title="Remove profile (the sign-in account stays until deleted in the Firebase console)"
+                          aria-label="Remove profile"
                         >
                           <Trash2 size={18} />
                         </button>
@@ -115,7 +117,7 @@ export default function AdminUsers() {
                     {/* Delete confirm inline */}
                     {delState === 'confirm' && (
                       <div className="flex items-center justify-end gap-2">
-                        <span className="text-xs font-bold text-red-600">Delete user?</span>
+                        <span className="text-xs font-bold text-red-600">Remove profile?</span>
                         <button
                           onClick={() => confirmDelete(u.id)}
                           className="flex items-center gap-1 px-3 py-1.5 bg-red-600 text-white font-bold rounded-lg hover:bg-red-700 text-xs transition"

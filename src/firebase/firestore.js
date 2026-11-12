@@ -1,6 +1,6 @@
 // src/firebase/firestore.js
 import {
-  collection, addDoc, doc, getDoc, getDocs, updateDoc, deleteDoc,
+  collection, addDoc, doc, getDoc, getDocs, updateDoc, deleteDoc, writeBatch, documentId,
   query, where, orderBy, limit, onSnapshot, serverTimestamp, arrayUnion
 } from 'firebase/firestore';
 import { db } from './config';
@@ -16,12 +16,14 @@ const listen = (q, cb) =>
 
 // ─── Reports ────────────────────────────────────────────────────────────────
 
-export const addReport = async (data) => {
-  const ref = await addDoc(collection(db, 'reports'), {
-    ...data,
-    status: 'pending',
-    createdAt: serverTimestamp(),
-  });
+// Reports are world readable, so they never carry the reporter's uid. When the reporter wants the
+// report in "My Reports", its id is appended to their own profile instead.
+export const addReport = async (data, linkToUid = null) => {
+  const ref = doc(collection(db, 'reports'));
+  const batch = writeBatch(db);
+  batch.set(ref, { ...data, status: 'pending', createdAt: serverTimestamp() });
+  if (linkToUid) batch.set(doc(db, 'users', linkToUid), { reportIds: arrayUnion(ref.id) }, { merge: true });
+  await batch.commit();
   return ref.id;
 };
 
@@ -33,8 +35,23 @@ export const getReport = async (id) => {
 export const getRecentReports = (cb, limitCount = 20) =>
   listen(query(collection(db, 'reports'), orderBy('createdAt', 'desc'), limit(limitCount)), cb);
 
-export const getUserReports = (userId, cb) =>
-  listen(query(collection(db, 'reports'), where('userId', '==', userId), orderBy('createdAt', 'desc')), cb);
+// shortcut: shows the newest 30 linked reports (Firestore `in` limit); paginate if anyone files more.
+export const getUserReports = (userId, cb) => {
+  let unsubReports = () => {};
+  const unsubUser = onSnapshot(
+    doc(db, 'users', userId),
+    (snap) => {
+      unsubReports();
+      const ids = (snap.data()?.reportIds || []).slice(-30).reverse();
+      if (!ids.length) return cb([]);
+      unsubReports = listen(query(collection(db, 'reports'), where(documentId(), 'in', ids)), (reports) =>
+        cb(ids.map((id) => reports.find((r) => r.id === id)).filter(Boolean))
+      );
+    },
+    (err) => console.error('Firestore listener failed', err)
+  );
+  return () => { unsubUser(); unsubReports(); };
+};
 
 export const updateReportStatus = (id, status) =>
   updateDoc(doc(db, 'reports', id), { status });

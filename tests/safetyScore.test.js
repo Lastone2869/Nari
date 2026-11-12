@@ -3,18 +3,34 @@ import assert from 'node:assert/strict';
 import { safetyScore } from '../src/lib/safetyScore.js';
 import { REPORT_STATUSES } from '../src/lib/reportStatus.js';
 
+const NOW = Date.UTC(2026, 10, 12);
+const DAY = 24 * 60 * 60 * 1000;
+const at = (daysAgo, type = 'theft') => ({ type, createdAt: { toMillis: () => NOW - daysAgo * DAY } });
+
 test('no reports means a perfect score', () => {
-  assert.equal(safetyScore([]), 100);
+  assert.equal(safetyScore([], NOW), 100);
 });
 
 test('severe incidents cost more than minor ones', () => {
-  assert.equal(safetyScore([{ type: 'harassment' }]), 94);
-  assert.equal(safetyScore([{ type: 'poor_lighting' }]), 98);
-  assert.equal(safetyScore([{ type: 'stalking' }, { type: 'theft' }, { type: undefined }]), 90);
+  const severe = safetyScore([at(1, 'harassment')], NOW);
+  const minor = safetyScore([at(1, 'poor_lighting')], NOW);
+  assert.equal(severe, 91);
+  assert.equal(minor, 97);
+  assert.ok(severe < minor);
 });
 
-test('score never drops below the floor', () => {
-  assert.equal(safetyScore(Array.from({ length: 100 }, () => ({ type: 'harassment' }))), 5);
+test('score keeps discriminating at volume instead of pinning to a floor', () => {
+  const fifty = safetyScore(Array.from({ length: 50 }, (_, i) => at(1, i % 2 ? 'harassment' : 'theft')), NOW);
+  const twoHundred = safetyScore(Array.from({ length: 200 }, () => at(1, 'harassment')), NOW);
+  assert.equal(fifty, 23);
+  assert.ok(twoHundred < fifty && twoHundred > 0);
+});
+
+test('reports older than 30 days are ignored, pending timestamps count', () => {
+  assert.equal(safetyScore([at(31, 'harassment'), at(45, 'stalking')], NOW), 100);
+  assert.equal(safetyScore([at(29, 'harassment')], NOW), 91);
+  assert.equal(safetyScore([{ type: 'harassment', createdAt: null }], NOW), 91);
+  assert.equal(safetyScore([{ type: 'harassment' }], NOW), 91);
 });
 
 test('report lifecycle starts pending and ends closed', () => {

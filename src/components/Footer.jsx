@@ -23,8 +23,8 @@ export default function Footer() {
           </div>
 
           <div>
-            <h4 className="mb-3 text-sm font-semibold uppercase tracking-[0.2em] text-nari-navy">Platform</h4>
-            <ul className="space-y-2.5">
+            <h2 className="mb-3 text-sm font-semibold uppercase tracking-[0.2em] text-nari-navy">Platform</h2>
+            <ul className="space-y-1">
               {[
                 { to: '/report', label: 'File a Report' },
                 { to: '/map', label: 'Safety Map' },
@@ -32,7 +32,7 @@ export default function Footer() {
                 { to: '/evidence', label: 'Evidence Locker' },
               ].map(({ to, label }) => (
                 <li key={to}>
-                  <Link to={to} className="text-sm text-gray-600 transition-colors hover:text-nari-navy">
+                  <Link to={to} className="inline-block py-1 text-sm text-gray-600 transition-colors hover:text-nari-navy">
                     {label}
                   </Link>
                 </li>
@@ -41,7 +41,7 @@ export default function Footer() {
           </div>
 
           <div>
-            <h4 className="mb-3 text-sm font-semibold uppercase tracking-[0.2em] text-nari-navy">Emergency</h4>
+            <h2 className="mb-3 text-sm font-semibold uppercase tracking-[0.2em] text-nari-navy">Emergency</h2>
             <ul className="space-y-2.5">
               {[
                 { label: 'Police', num: '100' },

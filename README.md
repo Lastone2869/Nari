@@ -10,7 +10,23 @@ cp .env.example .env   # optional: Google Maps key + Map ID for the live map
 npm run dev
 ```
 
-`npm run build` produces `dist/`. `npm run lint` and `npm test` must pass before deploying.
+`npm run build` produces `dist/`. `npm run lint`, `npm test` and `npm run test:rules` must pass before deploying.
+
+## Testing
+
+| Command | What it covers |
+|---|---|
+| `npm test` | Unit tests for the pure logic in `src/lib` (Node's built-in test runner, no extra dependency) |
+| `npm run test:rules` | Integration tests of `firestore.rules` against the Firestore emulator (needs Java 11+) |
+| `npm run emulators` then `npx vite --mode emulators` | Runs the whole app against local Auth, Firestore and Storage emulators, so reports, uploads and admin actions can be exercised without touching the live project |
+
+In the emulator, make yourself admin with the owner API:
+
+```bash
+curl -X PATCH -H "Authorization: Bearer owner" -H "Content-Type: application/json" "http://127.0.0.1:8080/v1/projects/nari-safety-os/databases/(default)/documents/users/YOUR_UID?updateMask.fieldPaths=role" -d '{"fields":{"role":{"stringValue":"admin"}}}'
+```
+
+Full results of the last test round are in `docs/TEST_REPORT.md`.
 
 ## Firebase setup (required once)
 
@@ -31,8 +47,8 @@ The Firebase web config in `src/firebase/config.js` is a public identifier, not 
 
 | Collection | Written by | Readable by |
 |---|---|---|
-| `users/{uid}` | owner (not `role`), admin | owner, admin |
-| `reports` | any signed-in user (`status: pending`) | everyone (public map + track by ID) |
+| `users/{uid}` (profile, `reportIds`) | owner (not `role`), admin | owner, admin |
+| `reports` | any signed-in user (`status: pending`, no reporter uid) | everyone (public map + track by ID) |
 | `evidence` | owner | owner, admin |
 | `alerts` | owner; resolved by owner or admin | owner, admin |
 | `safe_spaces` | admin | everyone |
@@ -41,9 +57,10 @@ Storage path `evidence/{uid}/…` accepts images, video, audio, PDF and Word fil
 
 ## Known limitations
 
-- Reports are world readable, so the `userId` of a non-anonymous report is visible to anyone who reads the collection. Use the Anonymous toggle for sensitive reports, or move public map data to a server-side projection.
+- Reports are world readable but never contain the reporter's identity. A non-anonymous report is linked by storing its id on the reporter's own private profile; "My Reports" shows the newest 30.
 - Deleting a user from the admin panel removes the profile document only; the Auth account must be deleted in the Firebase console.
 - The shared "live location" link is a static Google Maps pin of the first position. Only admins see the live trail.
-- No rate limiting on report or alert creation beyond Firebase quotas. Enable App Check for abuse protection.
-- The heatmap uses the Google Maps `visualization` library, which Google has deprecated; it still works but should be replaced eventually.
+- No rate limiting on report or alert creation beyond Firebase quotas. App Check is wired in: set `VITE_RECAPTCHA_SITE_KEY` and turn on enforcement in the Firebase console.
+- The density overlay and markers need a Google Maps API key; without one the map shows a placeholder, so that layer is untested here.
+- If an admin resolves a live alert, the reporter's own screen keeps showing it as active until they disarm.
 - Live SOS/recording state is kept in memory and ends if the tab is closed or reloaded.

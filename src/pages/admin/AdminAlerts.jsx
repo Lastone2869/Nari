@@ -127,7 +127,7 @@ export default function AdminAlerts() {
               <AlertTriangle size={32} className="text-emerald-500 opacity-50" />
             </div>
             <h3 className="text-xl font-black text-emerald-700 mb-2">No Active Emergencies</h3>
-            <p className="text-emerald-600 font-medium">All systems are quiet. The community is safe.</p>
+            <p className="text-emerald-700 font-medium">All systems are quiet. The community is safe.</p>
           </div>
         )}
       </div>

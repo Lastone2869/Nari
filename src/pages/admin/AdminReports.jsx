@@ -23,7 +23,7 @@ export default function AdminReports() {
 
   return (
     <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-      <div className="p-6 border-b border-gray-100 flex items-center justify-between bg-gray-50/50">
+      <div className="p-4 md:p-6 border-b border-gray-100 flex flex-wrap items-center justify-between gap-3 bg-gray-50/50">
         <h2 className="text-xl font-bold text-nari-navy">Incident Reports Management</h2>
         <div className="flex bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden text-sm font-bold">
           <button 

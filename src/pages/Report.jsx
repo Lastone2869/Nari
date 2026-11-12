@@ -75,7 +75,6 @@ export default function Report() {
     lat: null,
     lng: null,
     locationLabel: '',
-    mediaUrls: [],
   });
   const [loading, setLoading] = useState(false);
   const [done, setDone] = useState(false);
@@ -107,18 +106,16 @@ export default function Report() {
     try {
       const user = await ensureSignedIn(); // rules need a signed-in author even for anonymous reports
       const id = await addReport({
-        userId: anonymous ? 'anonymous' : user.uid,
         type: form.type,
         description: form.description.trim(),
         location: form.lat === null ? null : { lat: form.lat, lng: form.lng },
         locationLabel: form.locationLabel.trim(),
-        mediaUrls: form.mediaUrls,
         anonymous,
-      });
+      }, anonymous ? null : user.uid);
       setReportId(id);
       setDone(true);
     } catch (e) {
-      alert(`Error submitting report: ${e.message}`);
+      alert(`Error submitting report: ${e.message}`); // shortcut: native dialog, matches detectLocation
     } finally {
       setLoading(false);
     }
@@ -146,7 +143,7 @@ export default function Report() {
               onClick={() => {
                 setDone(false);
                 setStep(0);
-                setForm({ type: '', description: '', lat: null, lng: null, locationLabel: '', mediaUrls: [] });
+                setForm({ type: '', description: '', lat: null, lng: null, locationLabel: '' });
               }}
               className="flex-1 rounded-xl border border-gray-200 bg-white py-3 text-gray-700 transition-colors hover:bg-gray-50"
             >
@@ -193,6 +190,10 @@ export default function Report() {
               <span className="text-sm font-bold text-nari-navy">Anonymous Report</span>
             </div>
             <button
+              type="button"
+              role="switch"
+              aria-checked={anonymous}
+              aria-label="Submit anonymously"
               onClick={() => setAnonymous(!anonymous)}
               className={`relative h-6 w-12 rounded-full border border-nari-navy/10 shadow-inner transition-colors ${anonymous ? 'bg-nari-navy' : 'bg-gray-100'}`}
             >

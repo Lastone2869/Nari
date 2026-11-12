@@ -57,7 +57,7 @@ export default function SOSButton() {
           <button
             onClick={() => setExpanded(true)}
             aria-label="Open emergency options"
-            className="flex items-center gap-3 px-8 py-5 rounded-full font-bold text-white text-xl bg-red-600 hover:bg-red-700 animate-pulse shadow-[0_4px_24px_rgba(220,38,38,0.4)] transition-all hover:scale-105 active:scale-95"
+            className="flex items-center gap-3 px-8 py-5 rounded-full font-bold text-white text-xl bg-red-600 hover:bg-red-700 shadow-[0_4px_24px_rgba(220,38,38,0.4)] transition-all hover:scale-105 active:scale-95"
           >
             <Phone size={24} />
             SOS

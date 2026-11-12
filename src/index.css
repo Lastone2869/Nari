@@ -115,13 +115,13 @@ body {
 
 .badge-pending {
   background: rgba(255, 176, 32, 0.15);
-  color: #B47A00;
+  color: #8A5A00;
   border: 1px solid rgba(255, 176, 32, 0.3);
 }
 
 .badge-verified {
   background: rgba(79, 209, 197, 0.15);
-  color: #0C857B;
+  color: #0A6B63;
   border: 1px solid rgba(79, 209, 197, 0.3);
 }
 

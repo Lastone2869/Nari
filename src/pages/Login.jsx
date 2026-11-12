@@ -2,7 +2,11 @@ import { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Mail, Lock, User, Eye, EyeOff, AlertCircle } from 'lucide-react';
 import { loginWithEmail, loginWithGoogle, registerWithEmail, loginAnonymously } from '../firebase/auth';
+import { authErrorMessage } from '../lib/format';
 import NariLogo from '../components/NariLogo';
+
+const INPUT = 'w-full rounded-xl border border-gray-200 bg-gray-50 py-3 pl-11 pr-4 text-sm font-medium text-nari-navy outline-none transition focus:border-nari-navy/70 focus:bg-white focus:ring-[3px] focus:ring-nari-navy/10 placeholder:text-gray-400';
+const SECONDARY = 'flex h-11 items-center justify-center gap-2 rounded-xl border border-gray-200 bg-white text-[13px] font-bold text-gray-600 transition hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-60';
 
 export default function Login() {
   const [mode, setMode] = useState('login');
@@ -22,7 +26,7 @@ export default function Login() {
       await fn();
       navigate(from, { replace: true });
     } catch (e) {
-      setError(e.message?.replace('Firebase: ', '').replace(/\(auth.*\)/, '') || 'Something went wrong.');
+      setError(authErrorMessage(e));
     } finally {
       setLoading(false);
     }
@@ -31,104 +35,32 @@ export default function Login() {
   const submit = (e) => {
     e.preventDefault();
     if (mode === 'login') handle(() => loginWithEmail(form.email, form.password));
-    else handle(() => registerWithEmail(form.email, form.password, form.name));
-  };
-
-  const inputStyle = {
-    width: '100%',
-    padding: '13px 16px 13px 44px',
-    borderRadius: '12px',
-    background: '#F9FAFB',
-    border: '1px solid #E5E7EB',
-    color: '#1A365D',
-    fontSize: '14px',
-    fontWeight: '500',
-    outline: 'none',
-    fontFamily: 'inherit',
+    else handle(() => registerWithEmail(form.email, form.password, form.name.trim()));
   };
 
   return (
-    <div
-      style={{
-        minHeight: '100vh',
-        background: 'linear-gradient(180deg, rgba(247,250,252,1) 0%, rgba(255,255,255,1) 100%)',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        padding: '104px 16px 40px',
-      }}
-    >
-      <div style={{ position: 'fixed', inset: 0, pointerEvents: 'none', overflow: 'hidden' }}>
-        <div
-          style={{
-            position: 'absolute',
-            top: '10%',
-            left: '15%',
-            width: 300,
-            height: 300,
-            borderRadius: '50%',
-            background: 'rgba(26,54,93,0.05)',
-            filter: 'blur(80px)',
-          }}
-        />
-        <div
-          style={{
-            position: 'absolute',
-            bottom: '15%',
-            right: '10%',
-            width: 250,
-            height: 250,
-            borderRadius: '50%',
-            background: 'rgba(79,209,197,0.06)',
-            filter: 'blur(80px)',
-          }}
-        />
-      </div>
-
-      <div style={{ width: '100%', maxWidth: '420px', position: 'relative' }}>
-        <div style={{ textAlign: 'center', marginBottom: '32px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px', marginBottom: '8px' }}>
+    <div className="flex min-h-screen items-center justify-center bg-gradient-to-b from-[#f7fafc] to-white px-4 pb-10 pt-[104px]">
+      <div className="relative w-full max-w-[420px]">
+        <div className="mb-8 text-center">
+          <div className="mb-2 flex items-center justify-center gap-2.5">
             <NariLogo size={52} />
-            <span style={{ fontSize: '34px', fontWeight: 900, color: '#1A365D', letterSpacing: '0.18em', fontFamily: 'inherit' }}>
-              NARI
-            </span>
+            <h1 className="text-[34px] font-black tracking-[0.18em] text-nari-navy">NARI</h1>
           </div>
-          <p style={{ color: '#6B7280', fontSize: '13px', fontWeight: 500 }}>
-            {mode === 'login' ? 'Sign in to your account' : 'Create your account'}
-          </p>
+          <p className="text-[13px] font-medium text-gray-500">{mode === 'login' ? 'Sign in to your account' : 'Create your account'}</p>
         </div>
 
-        <div
-          style={{
-            background: 'white',
-            border: '1px solid #F3F4F6',
-            borderRadius: '28px',
-            padding: '32px 28px',
-            boxShadow: '0 24px 70px rgba(15,39,67,0.08)',
-          }}
-        >
-          <div style={{ display: 'flex', background: '#F3F4F6', borderRadius: '12px', padding: '4px', marginBottom: '24px' }}>
+        <div className="rounded-[28px] border border-gray-100 bg-white p-7 shadow-[0_24px_70px_rgba(15,39,67,0.08)]">
+          <div className="mb-6 flex rounded-xl bg-gray-100 p-1" role="tablist" aria-label="Sign in or register">
             {[['login', 'Sign In'], ['register', 'Register']].map(([m, label]) => (
               <button
                 key={m}
-                onClick={() => {
-                  setMode(m);
-                  setError('');
-                }}
-                style={{
-                  flex: 1,
-                  padding: '8px',
-                  borderRadius: '9px',
-                  fontSize: '13px',
-                  fontWeight: 700,
-                  border: 'none',
-                  cursor: 'pointer',
-                  transition: 'all 0.2s',
-                  fontFamily: 'inherit',
-                  ...(mode === m
-                    ? { background: 'white', color: '#1A365D', boxShadow: '0 2px 8px rgba(0,0,0,0.05)' }
-                    : { background: 'transparent', color: '#6B7280' }),
-                }}
+                type="button"
+                role="tab"
+                aria-selected={mode === m}
+                onClick={() => { setMode(m); setError(''); }}
+                className={`flex-1 rounded-[9px] py-2 text-[13px] font-bold transition ${
+                  mode === m ? 'bg-white text-nari-navy shadow-sm' : 'text-gray-600'
+                }`}
               >
                 {label}
               </button>
@@ -136,84 +68,44 @@ export default function Login() {
           </div>
 
           {error && (
-            <div
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: 8,
-                padding: '10px 12px',
-                borderRadius: 10,
-                marginBottom: 16,
-                background: '#FEF2F2',
-                border: '1px solid #FECACA',
-                color: '#EF4444',
-                fontSize: 13,
-                fontWeight: 600,
-              }}
-            >
-              <AlertCircle size={14} style={{ flexShrink: 0 }} />
+            <div role="alert" className="mb-4 flex items-center gap-2 rounded-[10px] border border-red-200 bg-red-50 px-3 py-2.5 text-[13px] font-semibold text-red-500">
+              <AlertCircle size={14} className="flex-shrink-0" />
               {error}
             </div>
           )}
 
-          <form onSubmit={submit} style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+          <form onSubmit={submit} className="flex flex-col gap-3">
             {mode === 'register' && (
-              <div style={{ position: 'relative' }}>
-                <User size={16} style={{ position: 'absolute', left: 14, top: '50%', transform: 'translateY(-50%)', color: '#9CA3AF' }} />
-                <input
-                  id="reg-name"
-                  type="text"
-                  placeholder="Full name"
-                  value={form.name}
-                  onChange={set('name')}
-                  required
-                  style={inputStyle}
-                  className="login-input"
-                />
+              <div className="relative">
+                <User size={16} className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" />
+                <input id="reg-name" type="text" placeholder="Full name" aria-label="Full name" value={form.name} onChange={set('name')} required autoComplete="name" className={INPUT} />
               </div>
             )}
 
-            <div style={{ position: 'relative' }}>
-              <Mail size={16} style={{ position: 'absolute', left: 14, top: '50%', transform: 'translateY(-50%)', color: '#9CA3AF' }} />
-              <input
-                id="auth-email"
-                type="email"
-                placeholder="Email address"
-                value={form.email}
-                onChange={set('email')}
-                required
-                style={inputStyle}
-                className="login-input"
-              />
+            <div className="relative">
+              <Mail size={16} className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" />
+              <input id="auth-email" type="email" placeholder="Email address" aria-label="Email address" value={form.email} onChange={set('email')} required autoComplete="email" className={INPUT} />
             </div>
 
-            <div style={{ position: 'relative' }}>
-              <Lock size={16} style={{ position: 'absolute', left: 14, top: '50%', transform: 'translateY(-50%)', color: '#9CA3AF' }} />
+            <div className="relative">
+              <Lock size={16} className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" />
               <input
                 id="auth-password"
                 type={showPw ? 'text' : 'password'}
                 placeholder="Password"
+                aria-label="Password"
                 value={form.password}
                 onChange={set('password')}
                 required
-                style={{ ...inputStyle, paddingRight: '44px' }}
-                className="login-input"
+                minLength={6}
+                autoComplete={mode === 'login' ? 'current-password' : 'new-password'}
+                className={`${INPUT} pr-11`}
               />
               <button
                 type="button"
                 onClick={() => setShowPw(!showPw)}
-                style={{
-                  position: 'absolute',
-                  right: 14,
-                  top: '50%',
-                  transform: 'translateY(-50%)',
-                  background: 'none',
-                  border: 'none',
-                  cursor: 'pointer',
-                  color: '#9CA3AF',
-                  display: 'flex',
-                  padding: 0,
-                }}
+                aria-label={showPw ? 'Hide password' : 'Show password'}
+                className="absolute right-1.5 top-1/2 flex -translate-y-1/2 p-2 text-gray-500 hover:text-nari-navy"
               >
                 {showPw ? <EyeOff size={16} /> : <Eye size={16} />}
               </button>
@@ -223,62 +115,21 @@ export default function Login() {
               id="auth-submit-btn"
               type="submit"
               disabled={loading}
-              style={{
-                width: '100%',
-                height: '48px',
-                borderRadius: '12px',
-                marginTop: '4px',
-                background: 'linear-gradient(135deg, #1A365D, #25538C)',
-                color: 'white',
-                fontSize: '15px',
-                fontWeight: 800,
-                border: 'none',
-                cursor: loading ? 'not-allowed' : 'pointer',
-                opacity: loading ? 0.6 : 1,
-                transition: 'all 0.2s',
-                boxShadow: '0 8px 24px rgba(26,54,93,0.25)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                fontFamily: 'inherit',
-                letterSpacing: '0.02em',
-              }}
+              className="mt-1 flex h-12 w-full items-center justify-center rounded-xl bg-gradient-to-br from-nari-navy to-[#25538C] text-[15px] font-extrabold tracking-wide text-white shadow-[0_8px_24px_rgba(26,54,93,0.25)] transition disabled:cursor-not-allowed disabled:opacity-60"
             >
               {loading ? 'Please wait...' : mode === 'login' ? 'Sign In' : 'Create Account'}
             </button>
           </form>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12, margin: '20px 0' }}>
-            <div style={{ flex: 1, height: 1, background: '#E5E7EB' }} />
-            <span style={{ color: '#9CA3AF', fontSize: 11, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.08em' }}>
-              or continue with
-            </span>
-            <div style={{ flex: 1, height: 1, background: '#E5E7EB' }} />
+          <div className="my-5 flex items-center gap-3">
+            <div className="h-px flex-1 bg-gray-200" />
+            <span className="text-[11px] font-semibold uppercase tracking-[0.08em] text-gray-500">or continue with</span>
+            <div className="h-px flex-1 bg-gray-200" />
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 10 }}>
-            <button
-              id="google-signin-btn"
-              onClick={() => handle(loginWithGoogle)}
-              disabled={loading}
-              style={{
-                height: 44,
-                borderRadius: 12,
-                border: '1px solid #E5E7EB',
-                background: 'white',
-                color: '#374151',
-                fontSize: 13,
-                fontWeight: 700,
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: 7,
-                transition: 'all 0.2s',
-                fontFamily: 'inherit',
-              }}
-            >
-              <svg width="15" height="15" viewBox="0 0 24 24">
+          <div className="grid grid-cols-2 gap-2.5">
+            <button id="google-signin-btn" type="button" onClick={() => handle(loginWithGoogle)} disabled={loading} className={`${SECONDARY} text-gray-700`}>
+              <svg width="15" height="15" viewBox="0 0 24 24" aria-hidden="true">
                 <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
                 <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
                 <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" />
@@ -286,41 +137,14 @@ export default function Login() {
               </svg>
               Google
             </button>
-
-            <button
-              id="anon-signin-btn"
-              onClick={() => handle(loginAnonymously)}
-              disabled={loading}
-              style={{
-                height: 44,
-                borderRadius: 12,
-                border: '1px solid #E5E7EB',
-                background: 'white',
-                color: '#6B7280',
-                fontSize: 13,
-                fontWeight: 700,
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                transition: 'all 0.2s',
-                fontFamily: 'inherit',
-              }}
-            >
+            <button id="anon-signin-btn" type="button" onClick={() => handle(loginAnonymously)} disabled={loading} className={SECONDARY}>
               Anonymous
             </button>
           </div>
 
-          <p style={{ textAlign: 'center', color: '#9CA3AF', fontSize: 11, marginTop: 16, lineHeight: 1.5 }}>
-            By continuing you agree to report truthfully.
-          </p>
+          <p className="mt-4 text-center text-[11px] leading-relaxed text-gray-500">By continuing you agree to report truthfully.</p>
         </div>
       </div>
-
-      <style>{`
-        .login-input::placeholder { color: #9CA3AF; }
-        .login-input:focus { border-color: rgba(26,54,93,0.7) !important; box-shadow: 0 0 0 3px rgba(26,54,93,0.12); background: white !important; }
-      `}</style>
     </div>
   );
 }

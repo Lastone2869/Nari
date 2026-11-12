@@ -70,30 +70,33 @@ Edited: Login, Report, Evidence, Profile, SafetyMap, AdminReports, AdminAlerts, 
 
 ## D. Remaining issues
 
+Second round (see `docs/TEST_REPORT.md`) closed most of the first list. What is left needs your Firebase account or a product decision.
+
 | Issue | Why unresolved | Action needed |
 |---|---|---|
-| Rules and indexes are not deployed | No Firebase CLI login in this environment | `firebase login && firebase deploy --only firestore:rules,firestore:indexes,storage` |
-| No admin account exists in the new model | Must be set server-side | Add `role: "admin"` to your `users/{uid}` doc in the console |
-| Report submit, evidence upload, admin flows not exercised end to end | Would write test data into the live Firestore and need an admin account | Run through after deploying rules; `npm run dev` |
-| Non-anonymous reports expose the reporter's uid to anyone who reads the collection | Firestore rules cannot hide fields | Cloud Function projection, or require sign-in to read reports |
-| No abuse/rate limiting on report or alert creation | Needs App Check | Enable App Check in the console |
-| Deleting a user only deletes the profile doc | Auth deletion needs the Admin SDK | Delete in console, or add a callable function |
-| Login page uses inline styles instead of Tailwind | Cosmetic; left to avoid churn | Optional rewrite |
-| 741 kB JS bundle (Firebase SDK dominates) | Code splitting saves little here | Optional: lazy-load admin routes |
-| Heatmap uses Google's deprecated `visualization` library | Still works | Replace with deck.gl or clustering later |
-| `imp.txt` planning notes at repo root | User's own notes | Move to `docs/` or delete |
+| Rules and indexes are not deployed to the live project | No Firebase CLI login in this environment | `firebase login && firebase deploy --only firestore:rules,firestore:indexes,storage` |
+| No admin account exists in the live project | Must be set server-side | Add `role: "admin"` to your `users/{uid}` doc in the console |
+| Existing live reports still carry the old `userId` field | No access to live data | One-time clean-up in the console: for each report with a real uid, add the report id to `users/{uid}.reportIds`, then delete the `userId` field |
+| App Check not enforced | Needs a reCAPTCHA v3 site key and a console switch | Set `VITE_RECAPTCHA_SITE_KEY`, enable enforcement for Firestore and Storage |
+| Admin "remove profile" does not delete the sign-in account | Needs the Admin SDK (Cloud Functions, paid plan) | Delete the account in the console, or add a callable function |
+| Live map layer (markers, density overlay) untested | No Google Maps API key available | Add the key to `.env` and check `/map` |
+| Reporter's screen is not told when an admin resolves their alert | Would need a listener on the alert doc | Small follow-up if wanted |
+| First paint on throttled mobile is about 2.5 s | Firebase SDK is most of the 300 kB first load | Acceptable now; lazy-load Firestore per route if it matters |
+
+Closed since the first round: reporter uid exposure on public reports, deprecated heatmap library, inline-styled Login page, single 741 kB bundle, missing end-to-end coverage of report/evidence/admin flows, planning notes at repo root.
 
 ## E. Production readiness
 
 | Area | Rating | Evidence |
 |---|---|---|
-| Security | **Not ready until rules are deployed**; code-level backdoor removed, rules written and reviewed | Live project currently rejects public reads, so console rules differ from repo |
-| Architecture | Good for scale | Simple, single trust boundary, shared helpers |
-| Frontend | Good | All routes verified in browser, lint clean, mobile OK |
-| Backend (Firebase wrappers) | Good | Error paths now surfaced; dead helpers removed |
-| Database | Acceptable | Indexes defined; schema validated in rules; no migrations needed |
-| Performance | Acceptable | 225 kB gzipped; no runtime hotspots at expected load |
-| Test coverage | Minimal | 4 unit tests on the only pure logic; no rules tests (needs emulator + Java) |
-| Deployment | Ready once rules ship | `firebase.json` with SPA rewrite and security headers |
+| Security | **Ready once rules are deployed** | 12 emulator tests prove the rules, including the old admin backdoor; Storage returns 403 without auth; reports hold no identity |
+| Architecture | Good for scale | Single trust boundary, shared helpers, route-level code splitting |
+| Frontend | Good | 30 functional checks pass in the browser against emulators; lint clean |
+| Backend (Firebase wrappers) | Good | Every write path exercised under real rules |
+| Database | Good | Schema validated in rules; one composite index; 300-report load renders in about 1 s |
+| Performance | Good | Lighthouse numbers in the test report |
+| Accessibility | Good | axe: zero WCAG A/AA violations on 11 pages after fixes; keyboard order and focus rings verified |
+| Test coverage | Reasonable | 9 unit tests, 12 rules integration tests, scripted end-to-end round (manual to repeat) |
+| Deployment | Ready once rules ship | `firebase.json` with SPA rewrite, security headers, emulator config |
 
-**Verdict:** deploy the rules and create the first admin, then re-run the report/evidence/admin journeys. After that the app is fit for a pilot; add App Check before any public launch.
+**Verdict:** deploy the rules, create the first admin, clean the old `userId` fields, then the app is fit for a pilot. Turn on App Check before a public launch.

@@ -70,7 +70,7 @@ export default function Profile() {
             </div>
 
             <div className="glass-card rounded-2xl p-5 shadow-sm">
-              <h3 className="text-nari-navy font-bold mb-3 text-sm uppercase tracking-wider">Your Activity</h3>
+              <h2 className="text-nari-navy font-bold mb-3 text-sm uppercase tracking-wider">Your Activity</h2>
               <div className="space-y-3">
                 {[
                   { label: 'Reports Filed', value: reports.length, icon: FileText, color: 'text-nari-navy' },
@@ -117,10 +117,10 @@ export default function Profile() {
                     />
                   </div>
                   <div>
-                    <label className="text-xs text-gray-500 font-bold mb-1 block uppercase tracking-wider">Email</label>
+                    <label htmlFor="profile-email" className="text-xs text-gray-500 font-bold mb-1 block uppercase tracking-wider">Email</label>
                     <div className="relative">
                       <Mail size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-                      <input type="email" value={user.email || ''} readOnly className="nari-input bg-gray-50 border-nari-navy/10 text-gray-500 pl-9 opacity-70 cursor-not-allowed shadow-none" />
+                      <input id="profile-email" type="email" value={user.email || ''} readOnly className="nari-input bg-gray-50 border-nari-navy/10 text-gray-500 pl-9 opacity-70 cursor-not-allowed shadow-none" />
                     </div>
                   </div>
                   <div>

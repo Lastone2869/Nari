@@ -24,12 +24,12 @@ service cloud.firestore {
       allow delete: if isAdmin();
     }
 
-    // Reports feed the public safety map and the track-by-ID page, so they are world readable.
-    // Non-anonymous reports expose the reporter's uid; see README "Known limitations".
+    // Reports feed the public safety map and the track-by-ID page, so they are world readable
+    // and therefore never store the reporter's identity (the reporter's profile keeps the ids).
     match /reports/{id} {
       allow read: if true;
       allow create: if signedIn()
-        && request.resource.data.userId in [request.auth.uid, 'anonymous']
+        && !('userId' in request.resource.data)
         && request.resource.data.status == 'pending'
         && request.resource.data.type is string
         && request.resource.data.description is string

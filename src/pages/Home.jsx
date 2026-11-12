@@ -231,7 +231,7 @@ export default function Home() {
               </div>
               <div className="rounded-2xl bg-nari-navy/5 px-3 py-2 text-right">
                 <div className="text-[10px] font-bold uppercase tracking-[0.24em] text-nari-navy/45">Status</div>
-                <div className={`mt-1 text-sm font-black ${emergency ? 'text-red-600' : 'text-emerald-600'}`}>
+                <div className={`mt-1 text-sm font-black ${emergency ? 'text-red-600' : 'text-emerald-700'}`}>
                   {emergency ? 'Alert mode' : 'Protected'}
                 </div>
               </div>
@@ -240,7 +240,7 @@ export default function Home() {
             <div className="flex flex-wrap items-center gap-2 rounded-full border border-gray-100 bg-gray-50 px-3 py-3 shadow-sm">
               <div className="flex items-center gap-2 rounded-full bg-white px-3 py-1.5">
                 <div className={`h-2.5 w-2.5 rounded-full animate-pulse ${emergency ? 'bg-red-500' : 'bg-emerald-500'}`} />
-                <span className={`text-sm font-bold ${emergency ? 'text-red-600' : 'text-emerald-600'}`}>
+                <span className={`text-sm font-bold ${emergency ? 'text-red-600' : 'text-emerald-700'}`}>
                   {emergency ? 'EMERGENCY ACTIVE' : 'You are Safe'}
                 </span>
               </div>
@@ -396,7 +396,7 @@ export default function Home() {
               onClick={handleSafeRoutes}
               className="zomato-card flex min-h-[152px] flex-col gap-3 bg-white p-4 text-left transition-all hover:bg-emerald-50 active:scale-95"
             >
-              <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-emerald-50 text-emerald-600">
+              <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-emerald-50 text-emerald-700">
                 <Route size={20} />
               </div>
               <span className="text-sm font-bold leading-snug whitespace-pre-line text-nari-navy">Find Safe{`\n`}Routes</span>
@@ -440,7 +440,7 @@ export default function Home() {
           </div>
 
           <div className="rounded-[2rem] border border-gray-100 bg-white p-5 shadow-sm">
-            <div className="mb-3 text-xs font-bold uppercase tracking-widest text-gray-400">One-Tap Emergency</div>
+            <div className="mb-3 text-xs font-bold uppercase tracking-widest text-gray-500">One-Tap Emergency</div>
             <div className="flex flex-col gap-2">
               {[
                 { name: 'Police Control Room', number: '100', color: 'text-blue-600', bg: 'bg-blue-50' },

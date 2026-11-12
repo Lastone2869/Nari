@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '../context/useAuth';
 import { addEvidence, getUserEvidence } from '../firebase/firestore';
 import { uploadEvidence } from '../firebase/storage';
+import { fmtSize } from '../lib/format';
 import { Upload, Lock, CheckCircle, FileImage, FileVideo, File, Copy, ExternalLink, Shield, AlertCircle } from 'lucide-react';
 
 const MAX_FILE_BYTES = 50 * 1024 * 1024; // mirrored in storage.rules
@@ -10,12 +11,6 @@ function FileIcon({ type }) {
   if (type?.startsWith('image')) return <FileImage size={18} className="text-nari-navy" />;
   if (type?.startsWith('video')) return <FileVideo size={18} className="text-nari-coral" />;
   return <File size={18} className="text-gray-500" />;
-}
-
-function fmtSize(bytes) {
-  if (bytes < 1024) return `${bytes} B`;
-  if (bytes < 1048576) return `${(bytes / 1024).toFixed(1)} KB`;
-  return `${(bytes / 1048576).toFixed(1)} MB`;
 }
 
 function EvidenceCard({ ev }) {
@@ -37,7 +32,7 @@ function EvidenceCard({ ev }) {
           <div className="truncate text-sm font-bold text-nari-navy">{ev.fileName}</div>
           <div className="mt-0.5 text-xs font-medium text-gray-600">{fmtSize(ev.fileSize)} | {ts}</div>
         </div>
-        <span className="flex-shrink-0 rounded-lg border border-nari-teal/30 bg-nari-teal/10 px-2 py-1 text-xs font-bold text-nari-teal">
+        <span className="flex-shrink-0 rounded-lg border border-nari-teal/30 bg-nari-teal/10 px-2 py-1 text-xs font-bold text-[#0A6B63]">
           Hashed
         </span>
       </div>
@@ -47,13 +42,13 @@ function EvidenceCard({ ev }) {
           <Shield size={11} className="text-nari-navy" />
           <span className="text-xs font-bold uppercase tracking-wider text-nari-navy">SHA-256 Hash</span>
         </div>
-        <div className="flex items-center gap-2">
-          <code className="flex-1 truncate font-mono text-xs font-semibold text-gray-500">{ev.hash}</code>
-          <button onClick={copy} className="flex-shrink-0 text-gray-400 transition-colors hover:text-nari-navy">
+        <div className="flex items-center gap-3">
+          <code className="flex-1 truncate font-mono text-xs font-semibold text-gray-600">{ev.hash}</code>
+          <button onClick={copy} aria-label="Copy hash" className="-m-1.5 flex-shrink-0 p-1.5 text-gray-500 transition-colors hover:text-nari-navy">
             {copied ? <CheckCircle size={14} className="text-nari-teal" /> : <Copy size={14} />}
           </button>
           {ev.fileUrl && (
-            <a href={ev.fileUrl} target="_blank" rel="noreferrer" className="flex-shrink-0 text-gray-400 transition-colors hover:text-nari-navy">
+            <a href={ev.fileUrl} target="_blank" rel="noreferrer" aria-label={`Open ${ev.fileName}`} className="-m-1.5 flex-shrink-0 p-1.5 text-gray-500 transition-colors hover:text-nari-navy">
               <ExternalLink size={14} />
             </a>
           )}
@@ -136,7 +131,7 @@ export default function Evidence() {
             { step: '03', label: 'Stored Securely', desc: 'Tamper-proof and verifiable' },
           ].map(({ step, label, desc }) => (
             <div key={step} className="zomato-card bg-white p-5 text-center">
-              <div className="mb-1 text-3xl font-black text-nari-navy/30">{step}</div>
+              <div className="mb-1 text-3xl font-black text-nari-navy/60">{step}</div>
               <div className="mb-1 text-sm font-bold text-nari-navy">{label}</div>
               <div className="text-xs font-medium text-gray-500">{desc}</div>
             </div>

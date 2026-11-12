@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Search, CheckCircle, Clock, AlertTriangle, Eye, ArrowUpRight, Shield, FileSearch } from 'lucide-react';
 import { getReport } from '../firebase/firestore';
-import { REPORT_STATUSES } from '../lib/reportStatus';
+import { REPORT_STATUSES, reportProgress } from '../lib/reportStatus';
 
 const FLOW_META = {
   pending:   { label: 'Submitted',    desc: 'Your report has been received.',              icon: FileSearch,    color: 'text-nari-navy',   ring: 'ring-nari-navy/40',   bg: 'bg-nari-navy/15' },
@@ -47,8 +47,7 @@ export default function Track() {
   const failed = !!routeId && failedId === routeId;
   const loading = !!routeId && !shown && !notFound && !failed;
 
-  const currentStep = FLOW.findIndex((f) => f.key === shown?.status);
-  const progressPct = currentStep >= 0 ? (((currentStep + 1) / FLOW.length) * 100).toFixed(0) : 0;
+  const { step: currentStep, pct: progressPct } = reportProgress(shown?.status);
 
   return (
     <div className="min-h-screen pt-20 pb-10 px-4">
@@ -131,7 +130,7 @@ export default function Track() {
 
             {/* Timeline */}
             <div className="glass-card rounded-2xl p-5 shadow-sm">
-              <h3 className="text-nari-navy font-bold mb-5">Status Timeline</h3>
+              <h2 className="text-nari-navy font-bold mb-5">Status Timeline</h2>
               <div className="space-y-0">
                 {FLOW.map(({ key, label, desc, icon: Icon, color, ring, bg }, i) => {
                   const done = i <= currentStep;

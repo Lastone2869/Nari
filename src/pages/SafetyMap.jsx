@@ -1,9 +1,9 @@
 /* global google */
-import { useState, useEffect, useMemo } from 'react';
-import { APIProvider, Map, AdvancedMarker, Pin, InfoWindow, useMap, useMapsLibrary } from '@vis.gl/react-google-maps';
+import { useState, useEffect } from 'react';
+import { APIProvider, Map, AdvancedMarker, Pin, InfoWindow, useMap } from '@vis.gl/react-google-maps';
 import { MapPin, Shield, AlertTriangle, Filter, Flame } from 'lucide-react';
 import { getRecentReports, getSafeSpaces } from '../firebase/firestore';
-import { safetyScore } from '../lib/safetyScore';
+import { safetyScore, SEVERE_TYPES } from '../lib/safetyScore';
 
 const MAPS_API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
 // Advanced Markers need a real Map ID; Google's DEMO_MAP_ID works for development.
@@ -24,51 +24,36 @@ const SPACE_LABELS = {
   safe_zone: 'Safe Zone',
 };
 
-function HeatmapLayer({ reports }) {
+// Density overlay built from core google.maps.Circle objects (Google deprecated the visualization library).
+function DensityLayer({ reports }) {
   const map = useMap();
-  const visualization = useMapsLibrary('visualization');
-
-  const heatmap = useMemo(() => {
-    if (!visualization) return null;
-    return new google.maps.visualization.HeatmapLayer({
-      radius: 35,
-      opacity: 0.8,
-      gradient: [
-        'rgba(0, 0, 0, 0)',
-        '#8b5cf6',
-        '#ec4899',
-        '#f59e0b',
-        '#f97316',
-        '#ef4444',
-        '#b91c1c',
-      ],
-    });
-  }, [visualization]);
 
   useEffect(() => {
-    if (!heatmap || !reports) return;
-
-    heatmap.setData(
-      reports
-        .filter((r) => r.location?.lat != null && r.location?.lng != null)
-        .map((r) => ({
-          location: new google.maps.LatLng(r.location.lat, r.location.lng),
-          weight: r.type === 'harassment' || r.type === 'stalking' ? 3 : 1,
-        }))
-    );
-  }, [heatmap, reports]);
-
-  useEffect(() => {
-    if (!heatmap) return;
-    heatmap.setMap(map);
-    return () => heatmap.setMap(null);
-  }, [heatmap, map]);
+    if (!map) return;
+    const circles = reports
+      .filter((r) => r.location?.lat != null && r.location?.lng != null)
+      .map((r) => {
+        const severe = SEVERE_TYPES.has(r.type);
+        return new google.maps.Circle({
+          map,
+          center: r.location,
+          radius: severe ? 350 : 200,
+          fillColor: severe ? '#ef4444' : '#f59e0b',
+          fillOpacity: 0.22,
+          strokeWeight: 0,
+          clickable: false,
+        });
+      });
+    return () => circles.forEach((c) => c.setMap(null));
+  }, [map, reports]);
 
   return null;
 }
 
 function SafetyScore({ score }) {
   const color = score >= 70 ? '#4FD1C5' : score >= 40 ? '#FFB020' : '#FF6B6B';
+  // darker tone of the same hue so the label passes AA contrast on white
+  const textColor = score >= 70 ? '#0C857B' : score >= 40 ? '#8A5A00' : '#B91C1C';
   const label = score >= 70 ? 'SAFE' : score >= 40 ? 'MODERATE' : 'UNSAFE';
 
   return (
@@ -91,7 +76,7 @@ function SafetyScore({ score }) {
       </div>
       <div>
         <div className="text-sm font-bold text-nari-navy">Area Safety Score</div>
-        <div className="mt-0.5 text-xs font-bold tracking-wider" style={{ color }}>
+        <div className="mt-0.5 text-xs font-bold tracking-wider" style={{ color: textColor }}>
           {label}
         </div>
         <div className="mt-1 text-xs text-gray-600">Based on community reports</div>
@@ -172,7 +157,7 @@ export default function SafetyMap() {
               <MapPin size={40} className="mb-3 animate-float text-nari-teal" />
               <p className="mb-1 font-bold text-nari-navy">Google Maps</p>
               <p className="max-w-xs text-center text-sm text-gray-600">
-                Add your Google Maps API key in <code className="font-mono text-nari-teal">VITE_GOOGLE_MAPS_API_KEY</code> to enable the live map.
+                Add your Google Maps API key in <code className="font-mono text-[#0C857B]">VITE_GOOGLE_MAPS_API_KEY</code> to enable the live map.
               </p>
               <div className="mt-4 grid w-full max-w-md grid-cols-3 gap-3 px-4">
                 {[...reports.slice(0, 3)].map((r) => (
@@ -210,7 +195,7 @@ export default function SafetyMap() {
                       </AdvancedMarker>
                     ))}
 
-                {showHeatmap && <HeatmapLayer reports={filters.reports ? reports : []} />}
+                {showHeatmap && <DensityLayer reports={filters.reports ? reports : []} />}
 
                 {spaces
                   .filter((s) => filters[s.type] && s.location?.lat != null)
