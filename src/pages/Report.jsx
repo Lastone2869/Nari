@@ -123,8 +123,8 @@ export default function Report() {
 
   if (done) {
     return (
-      <div className="min-h-screen flex items-center justify-center px-4 pt-20">
-        <div className="glass-card animate-slide-up w-full max-w-md rounded-[2rem] p-10 text-center">
+      <div className="flex min-h-screen items-center justify-center px-4 pt-28">
+        <div className="nari-card animate-slide-up w-full max-w-md rounded-[2rem] p-10 text-center">
           <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full border border-green-200 bg-green-50">
             <CheckCircle size={36} className="text-green-600" />
           </div>
@@ -156,10 +156,10 @@ export default function Report() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50/50 px-4 pb-10 pt-24 flex flex-col items-center">
+    <div className="flex min-h-screen flex-col items-center px-4 pb-16 pt-28">
       <div className="w-full max-w-xl">
         <div className="mb-8 text-center">
-          <h1 className="mb-2 text-4xl font-black tracking-tight text-nari-navy">File a Report</h1>
+          <h1 className="mb-2 text-3xl font-extrabold tracking-tight text-nari-navy sm:text-4xl">File a report</h1>
           <p className="text-base text-gray-600">Quick, secure, and anonymous if you choose.</p>
         </div>
 
@@ -177,13 +177,13 @@ export default function Report() {
               >
                 {i < step ? <CheckCircle size={14} /> : i + 1}
               </div>
-              <span className={`ml-2 hidden text-xs font-bold sm:block ${i === step ? 'text-nari-navy' : 'text-gray-500'}`}>{s}</span>
+              <span className={`ml-2 hidden text-xs font-bold sm:block ${i === step ? 'text-nari-navy' : 'text-gray-600'}`}>{s}</span>
               {i < STEPS.length - 1 && <div className={`mx-3 h-px flex-1 ${i < step ? 'bg-nari-teal/50' : 'bg-nari-navy/10'}`} />}
             </div>
           ))}
         </div>
 
-        <div className="zomato-card bg-white p-6 md:p-10">
+        <div className="nari-card bg-white p-6 md:p-10">
           <div className="mb-6 flex items-center justify-between rounded-xl border border-nari-navy/10 bg-white p-3 shadow-sm">
             <div className="flex items-center gap-2">
               <EyeOff size={16} className="text-gray-500" />
@@ -261,7 +261,7 @@ export default function Report() {
                 {locLoading ? 'Detecting...' : form.lat !== null ? 'Location Detected' : 'Auto-Detect My Location'}
               </button>
               {form.lat !== null && (
-                <div className="rounded-xl border border-nari-teal/30 bg-nari-teal/10 p-3 text-sm font-bold text-nari-teal shadow-sm">
+                <div className="rounded-xl border border-nari-teal/30 bg-nari-teal/10 p-3 text-sm font-bold text-nari-teal-deep shadow-sm">
                   {form.locationLabel}
                 </div>
               )}

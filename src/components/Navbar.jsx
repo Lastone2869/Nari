@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Shield, Menu, X, AlertCircle, User, LogOut, MapPin, FileText, Lock } from 'lucide-react';
+import { Shield, Menu, X, Phone, User, LogOut, MapPin, FileText, Lock } from 'lucide-react';
 import { useAuth } from '../context/useAuth';
 import { logout } from '../firebase/auth';
 import NariLogo from './NariLogo';
@@ -26,13 +26,13 @@ export default function Navbar() {
   if (location.pathname.startsWith('/admin')) return null;
 
   return (
-    <nav className="fixed left-0 right-0 top-0 z-50 border-b border-nari-navy/10 bg-white/90 shadow-[0_10px_30px_rgba(15,39,67,0.06)] backdrop-blur-xl">
+    <nav className="fixed left-0 right-0 top-0 z-50 border-b border-nari-navy/10 bg-white/90 backdrop-blur-xl">
       <div className="mx-auto grid h-[4.5rem] w-full max-w-7xl grid-cols-[auto_1fr_auto] items-center gap-4 px-4 sm:px-6 lg:px-8">
         <Link to="/" className="flex items-center gap-2.5">
           <NariLogo size={42} />
           <div className="leading-none">
             <span className="block font-display text-xl font-black tracking-[0.22em] text-nari-navy sm:text-2xl">NARI</span>
-            <span className="hidden text-[11px] font-semibold uppercase tracking-[0.3em] text-nari-navy/45 sm:block">
+            <span className="hidden text-[11px] font-semibold uppercase tracking-[0.3em] text-nari-navy/70 sm:block">
               Safety OS
             </span>
           </div>
@@ -58,13 +58,13 @@ export default function Navbar() {
         </div>
 
         <div className="hidden items-center gap-3 md:flex">
-          <Link
-            to="/report"
-            className="inline-flex h-11 flex-shrink-0 items-center justify-center gap-1.5 rounded-2xl bg-nari-coral px-4 text-sm font-bold whitespace-nowrap text-white shadow-md transition-all hover:-translate-y-0.5 hover:bg-[#e55353]"
+          <a
+            href="tel:112"
+            className="inline-flex h-11 flex-shrink-0 items-center justify-center gap-1.5 rounded-xl bg-nari-coral-deep px-4 text-sm font-bold whitespace-nowrap text-white transition-colors hover:bg-[#ad2936]"
           >
-            <AlertCircle size={15} />
-            Quick SOS
-          </Link>
+            <Phone size={15} />
+            Call 112
+          </a>
           {user ? (
             <div className="flex items-center gap-2">
               <Link
@@ -85,9 +85,9 @@ export default function Navbar() {
           ) : (
             <Link
               to="/login"
-              className="inline-flex h-11 flex-shrink-0 items-center justify-center rounded-2xl bg-nari-navy px-5 text-sm font-bold whitespace-nowrap text-white shadow-sm transition-colors hover:bg-[#132846]"
+              className="inline-flex h-11 flex-shrink-0 items-center justify-center rounded-xl bg-nari-navy px-5 text-sm font-bold whitespace-nowrap text-white transition-colors hover:bg-[#132846]"
             >
-              Sign In
+              Sign in
             </Link>
           )}
         </div>
@@ -121,14 +121,13 @@ export default function Navbar() {
               </Link>
             ))}
             <div className="flex gap-2 px-1 pt-3">
-              <Link
-                to="/report"
-                onClick={() => setOpen(false)}
-                className="flex flex-1 items-center justify-center gap-1 rounded-xl bg-nari-coral py-3 text-sm font-semibold text-white"
+              <a
+                href="tel:112"
+                className="flex flex-1 items-center justify-center gap-1.5 rounded-xl bg-nari-coral-deep py-3 text-sm font-semibold text-white"
               >
-                <AlertCircle size={14} />
-                SOS
-              </Link>
+                <Phone size={14} />
+                Call 112
+              </a>
               {user ? (
                 <button
                   onClick={() => {

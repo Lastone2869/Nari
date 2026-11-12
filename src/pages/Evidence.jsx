@@ -9,7 +9,7 @@ const MAX_FILE_BYTES = 50 * 1024 * 1024; // mirrored in storage.rules
 
 function FileIcon({ type }) {
   if (type?.startsWith('image')) return <FileImage size={18} className="text-nari-navy" />;
-  if (type?.startsWith('video')) return <FileVideo size={18} className="text-nari-coral" />;
+  if (type?.startsWith('video')) return <FileVideo size={18} className="text-nari-coral-deep" />;
   return <File size={18} className="text-gray-500" />;
 }
 
@@ -23,7 +23,7 @@ function EvidenceCard({ ev }) {
   const ts = ev.createdAt?.toDate?.()?.toLocaleString?.() || 'Uploading...';
 
   return (
-    <div className="zomato-card p-5 transition-all hover:border-nari-navy/30">
+    <div className="nari-card p-5 transition-all hover:border-nari-navy/30">
       <div className="mb-4 flex items-start gap-3">
         <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl border border-nari-navy/20 bg-nari-navy/10">
           <FileIcon type={ev.fileType} />
@@ -40,12 +40,12 @@ function EvidenceCard({ ev }) {
       <div className="rounded-xl border border-nari-navy/5 bg-gray-100 p-3 shadow-inner">
         <div className="mb-1 flex items-center gap-1">
           <Shield size={11} className="text-nari-navy" />
-          <span className="text-xs font-bold uppercase tracking-wider text-nari-navy">SHA-256 Hash</span>
+          <span className="text-xs font-bold text-nari-navy">SHA-256 hash</span>
         </div>
         <div className="flex items-center gap-3">
           <code className="flex-1 truncate font-mono text-xs font-semibold text-gray-600">{ev.hash}</code>
           <button onClick={copy} aria-label="Copy hash" className="-m-1.5 flex-shrink-0 p-1.5 text-gray-500 transition-colors hover:text-nari-navy">
-            {copied ? <CheckCircle size={14} className="text-nari-teal" /> : <Copy size={14} />}
+            {copied ? <CheckCircle size={14} className="text-nari-teal-deep" /> : <Copy size={14} />}
           </button>
           {ev.fileUrl && (
             <a href={ev.fileUrl} target="_blank" rel="noreferrer" aria-label={`Open ${ev.fileName}`} className="-m-1.5 flex-shrink-0 p-1.5 text-gray-500 transition-colors hover:text-nari-navy">
@@ -117,10 +117,10 @@ export default function Evidence() {
   };
 
   return (
-    <div className="flex min-h-[90vh] flex-col items-center justify-center bg-gray-50/50 px-4 pb-10 pt-24">
+    <div className="flex min-h-screen flex-col items-center px-4 pb-16 pt-28">
       <div className="w-full max-w-2xl">
         <div className="mb-8 text-center">
-          <h1 className="mb-2 text-4xl font-black tracking-tight text-nari-navy">Evidence Locker</h1>
+          <h1 className="mb-2 text-3xl font-extrabold tracking-tight text-nari-navy sm:text-4xl">Evidence locker</h1>
           <p className="text-base text-gray-600">Upload files and generate a SHA-256 hash for tamper-proof verification.</p>
         </div>
 
@@ -130,7 +130,7 @@ export default function Evidence() {
             { step: '02', label: 'Hash Generated', desc: 'SHA-256 fingerprint created' },
             { step: '03', label: 'Stored Securely', desc: 'Tamper-proof and verifiable' },
           ].map(({ step, label, desc }) => (
-            <div key={step} className="zomato-card bg-white p-5 text-center">
+            <div key={step} className="nari-card bg-white p-5 text-center">
               <div className="mb-1 text-3xl font-black text-nari-navy/60">{step}</div>
               <div className="mb-1 text-sm font-bold text-nari-navy">{label}</div>
               <div className="text-xs font-medium text-gray-500">{desc}</div>
@@ -144,7 +144,7 @@ export default function Evidence() {
           </div>
         )}
 
-        <div className="zomato-card mb-8 bg-white p-8">
+        <div className="nari-card mb-8 bg-white p-8">
             <div
               onDragOver={(e) => {
                 e.preventDefault();

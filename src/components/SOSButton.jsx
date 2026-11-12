@@ -16,10 +16,10 @@ export default function SOSButton() {
   if (location.pathname === '/' || location.pathname.startsWith('/admin')) return null;
 
   return (
-    <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end gap-2">
+    <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end gap-2 md:hidden">
       {expanded && (
-        <div className="glass-card rounded-2xl p-4 mb-1 animate-slide-up min-w-[200px]">
-          <p className="text-xs text-gray-500 mb-3 font-medium uppercase tracking-wider">Emergency Contacts</p>
+        <div className="nari-card rounded-2xl p-4 mb-1 animate-slide-up min-w-[200px]">
+          <p className="text-sm text-nari-navy mb-3 font-bold">Emergency numbers</p>
           <div className="space-y-2">
             {CONTACTS.map(({ label, num }) => (
               <a
@@ -28,7 +28,7 @@ export default function SOSButton() {
                 className="flex items-center justify-between px-3 py-2 rounded-xl bg-white hover:bg-nari-coral/10 border border-nari-navy/10 hover:border-nari-coral/30 transition-all group"
               >
                 <span className="text-sm text-gray-600 group-hover:text-nari-navy">{label}</span>
-                <span className="text-sm font-bold text-nari-coral">{num}</span>
+                <span className="text-sm font-bold text-nari-coral-deep">{num}</span>
               </a>
             ))}
           </div>

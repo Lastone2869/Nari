@@ -39,19 +39,19 @@ export default function Login() {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gradient-to-b from-[#f7fafc] to-white px-4 pb-10 pt-[104px]">
+    <div className="flex min-h-screen items-center justify-center px-4 pb-16 pt-28">
       <div className="relative w-full max-w-[420px]">
         <div className="mb-8 text-center">
           <div className="mb-2 flex items-center justify-center gap-2.5">
             <NariLogo size={52} />
             <h1 className="text-[34px] font-black tracking-[0.18em] text-nari-navy">NARI</h1>
           </div>
-          <p className="text-[13px] font-medium text-gray-500">{mode === 'login' ? 'Sign in to your account' : 'Create your account'}</p>
+          <p className="text-sm font-medium text-gray-600">{mode === 'login' ? 'Sign in to your account' : 'Create your account'}</p>
         </div>
 
-        <div className="rounded-[28px] border border-gray-100 bg-white p-7 shadow-[0_24px_70px_rgba(15,39,67,0.08)]">
+        <div className="nari-card p-7">
           <div className="mb-6 flex rounded-xl bg-gray-100 p-1" role="tablist" aria-label="Sign in or register">
-            {[['login', 'Sign In'], ['register', 'Register']].map(([m, label]) => (
+            {[['login', 'Sign in'], ['register', 'Register']].map(([m, label]) => (
               <button
                 key={m}
                 type="button"
@@ -115,15 +115,15 @@ export default function Login() {
               id="auth-submit-btn"
               type="submit"
               disabled={loading}
-              className="mt-1 flex h-12 w-full items-center justify-center rounded-xl bg-gradient-to-br from-nari-navy to-[#25538C] text-[15px] font-extrabold tracking-wide text-white shadow-[0_8px_24px_rgba(26,54,93,0.25)] transition disabled:cursor-not-allowed disabled:opacity-60"
+              className="mt-1 flex h-12 w-full items-center justify-center rounded-xl bg-nari-navy text-[15px] font-bold text-white transition-colors hover:bg-nari-ink disabled:cursor-not-allowed disabled:opacity-60"
             >
-              {loading ? 'Please wait...' : mode === 'login' ? 'Sign In' : 'Create Account'}
+              {loading ? 'Please wait...' : mode === 'login' ? 'Sign in' : 'Create account'}
             </button>
           </form>
 
           <div className="my-5 flex items-center gap-3">
             <div className="h-px flex-1 bg-gray-200" />
-            <span className="text-[11px] font-semibold uppercase tracking-[0.08em] text-gray-500">or continue with</span>
+            <span className="text-xs font-medium text-gray-500">or continue with</span>
             <div className="h-px flex-1 bg-gray-200" />
           </div>
 

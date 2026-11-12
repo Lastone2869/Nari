@@ -7,8 +7,8 @@ import { REPORT_STATUSES, reportProgress } from '../lib/reportStatus';
 
 const FLOW_META = {
   pending:   { label: 'Submitted',    desc: 'Your report has been received.',              icon: FileSearch,    color: 'text-nari-navy',   ring: 'ring-nari-navy/40',   bg: 'bg-nari-navy/15' },
-  verified:  { label: 'Verified',     desc: 'Our team has verified the incident.',         icon: Shield,        color: 'text-nari-teal', ring: 'ring-nari-teal/40', bg: 'bg-nari-teal/15' },
-  reviewing: { label: 'Under Review', desc: 'Authorities are reviewing your report.',      icon: Eye,           color: 'text-nari-amber',  ring: 'ring-nari-amber/40',  bg: 'bg-nari-amber/15' },
+  verified:  { label: 'Verified',     desc: 'Our team has verified the incident.',         icon: Shield,        color: 'text-nari-teal-deep', ring: 'ring-nari-teal/40', bg: 'bg-nari-teal/15' },
+  reviewing: { label: 'Under Review', desc: 'Authorities are reviewing your report.',      icon: Eye,           color: 'text-nari-amber-deep',  ring: 'ring-nari-amber/40',  bg: 'bg-nari-amber/15' },
   escalated: { label: 'Escalated',    desc: 'Case forwarded to higher authority.',         icon: ArrowUpRight,  color: 'text-[#f97316]', ring: 'ring-[#f97316]/40', bg: 'bg-[#f97316]/15' },
   resolved:  { label: 'Resolved',     desc: 'Action has been taken on your report.',      icon: CheckCircle,   color: 'text-[#4ade80]',  ring: 'ring-[#4ade80]/40',  bg: 'bg-[#4ade80]/15' },
   closed:    { label: 'Closed',       desc: 'This complaint has been officially closed.',  icon: Clock,         color: 'text-gray-500',   ring: 'ring-gray-400/40',   bg: 'bg-gray-200' },
@@ -50,13 +50,13 @@ export default function Track() {
   const { step: currentStep, pct: progressPct } = reportProgress(shown?.status);
 
   return (
-    <div className="min-h-screen pt-20 pb-10 px-4">
+    <div className="min-h-screen px-4 pb-16 pt-28">
       <div className="max-w-2xl mx-auto">
-        <h1 className="font-display text-3xl font-bold text-nari-navy mb-1">Track Complaint</h1>
+        <h1 className="mb-1 text-3xl font-extrabold tracking-tight text-nari-navy sm:text-4xl">Track a report</h1>
         <p className="text-gray-600 text-sm mb-8">Enter your Report ID to see real-time status.</p>
 
         {/* Search */}
-        <div className="flex gap-3 mb-8 shadow-sm">
+        <div className="flex gap-3 mb-8">
           <div className="relative flex-1">
             <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" />
             <input
@@ -74,7 +74,7 @@ export default function Track() {
             id="track-search-btn"
             onClick={search}
             disabled={!inputId.trim() || loading}
-            className="px-5 py-2.5 rounded-xl bg-nari-navy text-white font-semibold hover:bg-[#132846] disabled:opacity-40 transition-all flex items-center gap-2 shadow-md"
+            className="px-5 py-2.5 rounded-xl bg-nari-navy text-white font-semibold hover:bg-nari-ink disabled:opacity-40 transition-colors flex items-center gap-2"
           >
             {loading ? <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /> : <Search size={15} />}
             Track
@@ -82,8 +82,8 @@ export default function Track() {
         </div>
 
         {(notFound || failed) && (
-          <div role="alert" className="glass-card rounded-2xl p-6 text-center border-nari-amber/20 bg-nari-amber/5">
-            <AlertTriangle size={32} className="text-nari-amber mx-auto mb-3" />
+          <div role="alert" className="nari-card rounded-2xl p-6 text-center border-nari-amber/20 bg-nari-amber/5">
+            <AlertTriangle size={32} className="text-nari-amber-deep mx-auto mb-3" />
             <p className="text-nari-navy font-bold">{failed ? 'Could not load this report' : 'Report Not Found'}</p>
             <p className="text-gray-600 text-sm mt-1">
               {failed ? 'The server refused the request. Check your connection or try again later.' : 'Check your Report ID and try again.'}
@@ -94,10 +94,10 @@ export default function Track() {
         {shown && (
           <div className="space-y-5 animate-slide-up">
             {/* Summary card */}
-            <div className="glass-card rounded-2xl p-5 shadow-sm">
+            <div className="nari-card rounded-2xl p-5 shadow-sm">
               <div className="flex items-start justify-between mb-4">
                 <div>
-                  <div className="text-xs text-gray-500 mb-1 font-semibold uppercase tracking-wider">Report ID</div>
+                  <div className="text-xs text-gray-500 mb-1 font-semibold">Report ID</div>
                   <div className="font-mono text-sm text-nari-navy font-bold">{shown.id}</div>
                 </div>
                 <span className={`px-3 py-1 rounded-full text-xs font-bold badge-${shown.status === 'pending' ? 'pending' : shown.status === 'resolved' ? 'resolved' : 'verified'}`}>
@@ -129,7 +129,7 @@ export default function Track() {
             </div>
 
             {/* Timeline */}
-            <div className="glass-card rounded-2xl p-5 shadow-sm">
+            <div className="nari-card rounded-2xl p-5 shadow-sm">
               <h2 className="text-nari-navy font-bold mb-5">Status Timeline</h2>
               <div className="space-y-0">
                 {FLOW.map(({ key, label, desc, icon: Icon, color, ring, bg }, i) => {
@@ -148,8 +148,8 @@ export default function Track() {
                         )}
                       </div>
                       <div className={`pb-6 ${i === FLOW.length - 1 ? 'pb-0' : ''}`}>
-                        <div className={`font-bold text-sm ${done ? 'text-nari-navy' : 'text-gray-400'}`}>{label}</div>
-                        <div className={`text-xs mt-0.5 ${done ? 'text-gray-600' : 'text-gray-400'}`}>{desc}</div>
+                        <div className={`font-bold text-sm ${done ? 'text-nari-navy' : 'text-gray-500'}`}>{label}</div>
+                        <div className={`text-xs mt-0.5 ${done ? 'text-gray-600' : 'text-gray-500'}`}>{desc}</div>
                         {active && (
                           <div className="mt-2 inline-flex items-center gap-1 text-xs font-bold px-2 py-1 rounded-md bg-nari-navy/10 text-nari-navy border border-nari-navy/20">
                             <div className="w-1.5 h-1.5 rounded-full bg-nari-teal animate-pulse" />

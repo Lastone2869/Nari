@@ -49,33 +49,33 @@ export default function Profile() {
   const isAnon = user.isAnonymous;
 
   return (
-    <div className="min-h-screen pt-20 pb-10 px-4">
+    <div className="min-h-screen px-4 pb-16 pt-28">
       <div className="max-w-3xl mx-auto">
-        <h1 className="font-display text-3xl font-bold text-nari-navy mb-8">My Profile</h1>
+        <h1 className="mb-8 text-3xl font-extrabold tracking-tight text-nari-navy sm:text-4xl">My profile</h1>
 
         <div className="grid md:grid-cols-3 gap-5">
           {/* Left: Avatar + stats */}
           <div className="space-y-4">
-            <div className="glass-card rounded-2xl p-6 text-center shadow-sm">
+            <div className="nari-card rounded-2xl p-6 text-center shadow-sm">
               <div className="w-20 h-20 rounded-full bg-nari-navy flex items-center justify-center mx-auto mb-4 shadow-md">
                 <User size={32} className="text-white" />
               </div>
               <div className="text-nari-navy font-bold text-lg">{isAnon ? 'Anonymous User' : (profile.name || user.displayName || 'User')}</div>
               <div className="text-gray-600 font-medium text-sm mt-0.5">{isAnon ? 'Anonymous Session' : user.email}</div>
               {isAnon && (
-                <div className="mt-3 text-xs px-3 py-1.5 rounded-xl bg-nari-amber/10 border border-nari-amber/30 text-nari-amber font-semibold">
+                <div className="mt-3 text-xs px-3 py-1.5 rounded-xl bg-nari-amber/10 border border-nari-amber/30 text-nari-amber-deep font-semibold">
                   Anonymous account — data lost on sign out
                 </div>
               )}
             </div>
 
-            <div className="glass-card rounded-2xl p-5 shadow-sm">
-              <h2 className="text-nari-navy font-bold mb-3 text-sm uppercase tracking-wider">Your Activity</h2>
+            <div className="nari-card rounded-2xl p-5 shadow-sm">
+              <h2 className="text-nari-navy font-bold mb-3">Your activity</h2>
               <div className="space-y-3">
                 {[
                   { label: 'Reports Filed', value: reports.length, icon: FileText, color: 'text-nari-navy' },
-                  { label: 'Resolved', value: reports.filter((r) => r.status === 'resolved').length, icon: CheckCircle, color: 'text-nari-teal' },
-                  { label: 'Pending', value: reports.filter((r) => r.status === 'pending').length, icon: AlertCircle, color: 'text-nari-amber' },
+                  { label: 'Resolved', value: reports.filter((r) => r.status === 'resolved').length, icon: CheckCircle, color: 'text-nari-teal-deep' },
+                  { label: 'Pending', value: reports.filter((r) => r.status === 'pending').length, icon: AlertCircle, color: 'text-nari-amber-deep' },
                 ].map(({ label, value, icon: Icon, color }) => (
                   <div key={label} className="flex items-center justify-between">
                     <div className="flex items-center gap-2 text-gray-600 font-semibold text-sm">
@@ -90,7 +90,7 @@ export default function Profile() {
             <button
               id="profile-logout-btn"
               onClick={handleLogout}
-              className="w-full py-2.5 rounded-xl bg-red-500/10 border border-red-500/30 text-red-400 font-semibold text-sm hover:bg-red-500/20 transition-colors flex items-center justify-center gap-2"
+              className="w-full py-2.5 rounded-xl border border-red-200 bg-white text-red-700 font-semibold text-sm hover:bg-red-50 transition-colors flex items-center justify-center gap-2"
             >
               <LogOut size={14} />Sign Out
             </button>
@@ -99,14 +99,14 @@ export default function Profile() {
           {/* Right: Edit profile + reports */}
           <div className="md:col-span-2 space-y-5">
             {!isAnon && (
-              <div className="glass-card rounded-2xl p-6 shadow-sm">
+              <div className="nari-card rounded-2xl p-6 shadow-sm">
                 <h2 className="text-nari-navy font-bold mb-4 flex items-center gap-2">
                   <User size={15} className="text-nari-navy" />
                   Edit Profile
                 </h2>
                 <div className="space-y-4">
                   <div>
-                    <label htmlFor="profile-name" className="text-xs text-gray-500 font-bold mb-1 block uppercase tracking-wider">Name</label>
+                    <label htmlFor="profile-name" className="text-xs text-gray-500 font-bold mb-1 block">Name</label>
                     <input
                       id="profile-name"
                       type="text"
@@ -117,14 +117,14 @@ export default function Profile() {
                     />
                   </div>
                   <div>
-                    <label htmlFor="profile-email" className="text-xs text-gray-500 font-bold mb-1 block uppercase tracking-wider">Email</label>
+                    <label htmlFor="profile-email" className="text-xs text-gray-500 font-bold mb-1 block">Email</label>
                     <div className="relative">
                       <Mail size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-                      <input id="profile-email" type="email" value={user.email || ''} readOnly className="nari-input bg-gray-50 border-nari-navy/10 text-gray-500 pl-9 opacity-70 cursor-not-allowed shadow-none" />
+                      <input id="profile-email" type="email" value={user.email || ''} readOnly className="nari-input bg-gray-50 border-nari-navy/10 text-gray-600 pl-9 cursor-not-allowed" />
                     </div>
                   </div>
                   <div>
-                    <label htmlFor="profile-phone" className="text-xs text-gray-500 font-bold mb-1 block uppercase tracking-wider">Phone</label>
+                    <label htmlFor="profile-phone" className="text-xs text-gray-500 font-bold mb-1 block">Phone</label>
                     <div className="relative">
                       <Phone size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
                       <input
@@ -151,7 +151,7 @@ export default function Profile() {
             )}
 
             {/* My reports */}
-            <div className="glass-card rounded-2xl p-6 shadow-sm">
+            <div className="nari-card rounded-2xl p-6 shadow-sm">
               <h2 className="text-nari-navy font-bold mb-4 flex items-center gap-2">
                 <FileText size={15} className="text-nari-navy" />
                 My Reports
@@ -160,7 +160,7 @@ export default function Profile() {
                 <div className="text-center py-8">
                   <FileText size={24} className="text-gray-400 mx-auto mb-2" />
                   <p className="text-gray-500 font-semibold text-sm">No reports yet.</p>
-                  <Link to="/report" className="text-nari-teal font-bold text-sm hover:underline transition-all inline-block mt-2">File your first report →</Link>
+                  <Link to="/report" className="text-nari-teal-deep font-bold text-sm hover:underline transition-all inline-block mt-2">File your first report</Link>
                 </div>
               ) : (
                 <div className="space-y-2 max-h-72 overflow-y-auto pr-1">

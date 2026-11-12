@@ -1,6 +1,7 @@
 import { Link, useLocation, useNavigate, Outlet } from 'react-router-dom';
 import { LayoutDashboard, FileText, Users, AlertTriangle, Map, LogOut } from 'lucide-react';
 import { logout } from '../firebase/auth';
+import NariLogo from '../components/NariLogo';
 
 const NAV_ITEMS = [
   { path: '/admin', label: 'Dashboard', icon: LayoutDashboard },
@@ -18,10 +19,10 @@ export default function AdminLayout() {
   return (
     <div className="flex h-screen bg-gray-100 overflow-hidden font-sans">
       {/* Sidebar */}
-      <aside className="w-16 md:w-64 bg-gray-900 text-white flex flex-col flex-shrink-0">
-        <div className="p-4 md:p-6 border-b border-gray-800">
+      <aside className="w-16 md:w-64 bg-nari-ink text-white flex flex-col flex-shrink-0">
+        <div className="p-4 md:p-6 border-b border-white/10">
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-red-600 flex items-center justify-center font-black">N</div>
+            <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg bg-white"><NariLogo size={24} /></div>
             <span className="hidden md:inline text-xl font-bold tracking-widest uppercase">Admin</span>
           </div>
         </div>
@@ -36,7 +37,7 @@ export default function AdminLayout() {
                 title={label}
                 aria-current={active ? 'page' : undefined}
                 className={`flex items-center justify-center md:justify-start gap-3 px-3 md:px-4 py-3 rounded-xl font-medium transition-all ${
-                  active ? 'bg-nari-navy text-white shadow-lg' : 'text-gray-400 hover:text-white hover:bg-gray-800'
+                  active ? 'bg-white/15 text-white' : 'text-white/65 hover:text-white hover:bg-white/10'
                 }`}
               >
                 <Icon size={18} className={active ? 'text-teal-400' : ''} />
@@ -46,7 +47,7 @@ export default function AdminLayout() {
           })}
         </nav>
 
-        <div className="p-4 border-t border-gray-800">
+        <div className="p-4 border-t border-white/10">
           <button
             onClick={exit}
             title="Exit Admin"

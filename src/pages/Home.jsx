@@ -6,14 +6,13 @@ import {
   Mic,
   Route,
   AlertTriangle,
-  Navigation,
   Phone,
   CheckCircle,
   XCircle,
   StopCircle,
   Share2,
 } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { ensureSignedIn } from '../firebase/auth';
 import { startLiveAlert, updateLiveAlertLocation, resolveLiveAlert } from '../firebase/firestore';
 import { sosSession } from '../lib/sosSession';
@@ -59,6 +58,33 @@ const startTracking = (onPosition) =>
   });
 
 const LABELS = { audio: 'Audio', video: 'Video' };
+
+const CONTACTS = [
+  { name: 'Police control room', number: '100' },
+  { name: 'Women helpline', number: '1091' },
+  { name: 'Ambulance', number: '108' },
+];
+
+// One quick action. Toggles pass `active`; a filled tile means "this is running now".
+function ActionTile({ icon: Icon, activeIcon: ActiveIcon = Icon, title, hint, active, tone = 'navy', ...props }) {
+  const on = tone === 'red' ? 'border-red-600 bg-red-600 text-white' : 'border-nari-navy bg-nari-navy text-white';
+  return (
+    <button
+      type="button"
+      aria-pressed={active}
+      {...props}
+      className={`flex min-h-[132px] flex-col items-start gap-2 rounded-2xl border p-4 text-left transition-colors active:scale-[0.98] ${
+        active ? on : 'border-nari-navy/10 bg-white text-nari-navy hover:border-nari-navy/35'
+      }`}
+    >
+      <span className={`flex h-10 w-10 items-center justify-center rounded-xl ${active ? 'bg-white/20' : 'bg-nari-navy/[0.06]'}`}>
+        {active ? <ActiveIcon size={20} /> : <Icon size={20} />}
+      </span>
+      <span className="text-[15px] font-bold leading-tight">{title}</span>
+      <span className={`text-[13px] leading-5 ${active ? 'text-white/85' : 'text-gray-600'}`}>{hint}</span>
+    </button>
+  );
+}
 
 export default function Home() {
   const [emergency, setEmergency] = useState(() => Boolean(sosSession.sosTracker));
@@ -218,49 +244,27 @@ export default function Home() {
 
   return (
     <>
-      <div className="flex min-h-screen justify-center bg-gradient-to-b from-white via-[#fbfdff] to-[#f2f7fb] px-4 pb-28 pt-24">
-        <div className="flex w-full max-w-[31rem] flex-col gap-5">
-          <div className="rounded-[2rem] border border-white/70 bg-white/85 p-5 shadow-[0_24px_60px_rgba(15,39,67,0.08)] backdrop-blur-sm">
-            <div className="mb-4 flex items-start justify-between gap-3">
-              <div>
-                <p className="text-[11px] font-black uppercase tracking-[0.28em] text-nari-coral/75">Emergency Console</p>
-                <h1 className="mt-2 text-2xl font-black tracking-tight text-nari-navy">Stay ready, stay connected.</h1>
-                <p className="mt-1 text-sm leading-6 text-gray-600">
-                  One-touch emergency response, fast evidence capture, and location sharing in a single calm interface.
-                </p>
-              </div>
-              <div className="rounded-2xl bg-nari-navy/5 px-3 py-2 text-right">
-                <div className="text-[10px] font-bold uppercase tracking-[0.24em] text-nari-navy/45">Status</div>
-                <div className={`mt-1 text-sm font-black ${emergency ? 'text-red-600' : 'text-emerald-700'}`}>
-                  {emergency ? 'Alert mode' : 'Protected'}
-                </div>
-              </div>
-            </div>
+      <div className="mx-auto min-h-screen w-full max-w-6xl px-4 pb-24 pt-28 sm:px-6 lg:px-8">
+        <div className="grid gap-6 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)] lg:gap-10">
+          <section
+            className={`nari-card flex flex-col items-center justify-center px-6 py-10 text-center transition-colors lg:py-14 ${
+              emergency ? 'border-red-300 bg-red-50' : ''
+            }`}
+          >
+            <h1 className="text-3xl font-extrabold tracking-tight text-nari-navy sm:text-[2.6rem] sm:leading-[1.1]">
+              {emergency ? 'Your alert is live' : 'Need help now?'}
+            </h1>
+            <p className="mt-3 max-w-sm text-[15px] leading-6 text-gray-600">
+              {emergency
+                ? 'Responders can see where you are. Your location keeps updating until you disarm, even if you open other pages.'
+                : 'Press and hold SOS for 3 seconds. Your live location goes to NARI responders until you disarm.'}
+            </p>
 
-            <div className="flex flex-wrap items-center gap-2 rounded-full border border-gray-100 bg-gray-50 px-3 py-3 shadow-sm">
-              <div className="flex items-center gap-2 rounded-full bg-white px-3 py-1.5">
-                <div className={`h-2.5 w-2.5 rounded-full animate-pulse ${emergency ? 'bg-red-500' : 'bg-emerald-500'}`} />
-                <span className={`text-sm font-bold ${emergency ? 'text-red-600' : 'text-emerald-700'}`}>
-                  {emergency ? 'EMERGENCY ACTIVE' : 'You are Safe'}
-                </span>
-              </div>
-              <div className="flex items-center gap-1 rounded-full bg-white px-3 py-1.5 text-xs font-bold text-gray-500">
-                <Navigation size={12} className="text-nari-teal" />
-                GPS Ready
-              </div>
-              <div className="flex items-center gap-1 rounded-full bg-white px-3 py-1.5 text-xs font-bold text-gray-500">
-                <Shield size={12} className="text-nari-navy" />
-                Quick Actions Live
-              </div>
-            </div>
-          </div>
-
-          <div className="relative flex min-h-[380px] flex-col items-center justify-center rounded-[2rem] border border-white/70 bg-white/90 px-6 py-8 shadow-[0_20px_50px_rgba(15,39,67,0.08)]">
             <button
               type="button"
               aria-label="Press and hold for 3 seconds to start an SOS alert"
               aria-pressed={emergency}
-              className="relative z-10 flex cursor-pointer touch-none select-none items-center justify-center rounded-full"
+              className="relative mt-10 flex cursor-pointer touch-none select-none items-center justify-center rounded-full"
               onPointerDown={startHold}
               onPointerUp={endHold}
               onPointerLeave={endHold}
@@ -269,24 +273,19 @@ export default function Home() {
               onKeyDown={(e) => { if ((e.key === ' ' || e.key === 'Enter') && !e.repeat) { e.preventDefault(); startHold(); } }}
               onKeyUp={endHold}
             >
-              <span
-                className={`absolute inset-0 -m-8 rounded-full ${emergency ? 'bg-red-500/20' : 'bg-red-500/10'} animate-ping opacity-20`}
-                style={{ animationDuration: '3s' }}
-              />
-              <span
-                className={`absolute inset-0 -m-4 rounded-full ${emergency ? 'bg-red-500/30' : 'bg-red-500/10'} animate-ping opacity-40`}
-                style={{ animationDuration: '2s' }}
-              />
+              {emergency && (
+                <span className="absolute inset-0 -m-3 rounded-full bg-red-500/25 animate-ping" style={{ animationDuration: '2s' }} />
+              )}
 
-              <svg viewBox="0 0 200 200" className="pointer-events-none absolute h-[220px] w-[220px] -rotate-90" aria-hidden="true">
-                <circle cx="100" cy="100" r="95" fill="none" stroke="rgba(220, 38, 38, 0.1)" strokeWidth="8" />
+              <svg viewBox="0 0 200 200" className="pointer-events-none absolute h-[228px] w-[228px] -rotate-90" aria-hidden="true">
+                <circle cx="100" cy="100" r="95" fill="none" stroke="rgba(220, 38, 38, 0.12)" strokeWidth="6" />
                 <circle
                   cx="100"
                   cy="100"
                   r="95"
                   fill="none"
                   stroke="#DC2626"
-                  strokeWidth="10"
+                  strokeWidth="8"
                   strokeLinecap="round"
                   strokeDasharray="597"
                   strokeDashoffset={597 - (597 * holdProgress) / 100}
@@ -295,191 +294,129 @@ export default function Home() {
               </svg>
 
               <span
-                className={`flex h-44 w-44 flex-col items-center justify-center rounded-full text-white transition-all duration-300 ${
-                  emergency
-                    ? 'scale-95 bg-red-600 shadow-[0_0_40px_rgba(220,38,38,0.8)]'
-                    : holding
-                      ? 'scale-95 bg-red-600 shadow-[0_0_30px_rgba(220,38,38,0.6)]'
-                      : 'bg-red-500 shadow-2xl hover:bg-red-600'
+                className={`relative flex h-44 w-44 flex-col items-center justify-center rounded-full bg-red-600 text-white shadow-[0_18px_40px_rgba(220,38,38,0.35)] transition-transform duration-200 ${
+                  holding || emergency ? 'scale-95' : 'hover:scale-[1.02]'
                 }`}
               >
-                <Shield size={48} className={`mb-1 ${holding && !emergency ? 'animate-bounce' : ''}`} />
-                <span className="text-2xl font-black uppercase tracking-widest">SOS</span>
+                <Shield size={44} className="mb-1" aria-hidden="true" />
+                <span className="font-display text-3xl font-extrabold tracking-wide">SOS</span>
                 {holding && !emergency && (
-                  <span className="pointer-events-none absolute select-none text-6xl font-black text-white/20">
+                  <span className="pointer-events-none absolute text-7xl font-black text-white/25">
                     {Math.ceil(3 - (holdProgress / 100) * 3)}
                   </span>
                 )}
               </span>
             </button>
 
-            <div className="mt-8 flex w-full flex-col items-center gap-3">
-              <div className="w-full rounded-full bg-gray-100 px-4 py-2 text-center opacity-90" aria-live="polite">
-                {emergency ? (
-                  <span className="text-sm font-bold tracking-wide text-red-600">Live location alert active.</span>
-                ) : (
-                  <span className="text-xs font-bold uppercase tracking-wider text-gray-500">Press and hold for 3 seconds</span>
-                )}
-              </div>
-              <p className="max-w-xs text-center text-sm leading-5 text-gray-500">
-                Holding the SOS button starts a live alert that shares your location with responders. It keeps running while you use other pages.
-              </p>
-
-              {emergency && (
-                <button
-                  onClick={stopEmergency}
-                  className="flex w-full items-center justify-center gap-2 rounded-full bg-gray-900 px-6 py-3 font-bold tracking-wide text-white shadow-sm transition-all hover:bg-gray-800 active:scale-95"
-                >
-                  <XCircle size={18} />
-                  Disarm Emergency
-                </button>
-              )}
-            </div>
-          </div>
-
-          <div className="grid grid-cols-2 gap-3">
-            <button
-              onClick={handleShareLocationToggle}
-              aria-pressed={locationSharing}
-              className={`zomato-card flex min-h-[152px] flex-col gap-3 p-4 text-left transition-all active:scale-95 ${
-                locationSharing ? 'bg-blue-600 text-white shadow-[0_18px_40px_rgba(37,99,235,0.22)]' : 'bg-white hover:bg-blue-50'
-              }`}
+            <p
+              aria-live="polite"
+              className={`mt-10 text-sm font-semibold ${emergency ? 'text-red-700' : 'text-gray-600'}`}
             >
-              <div className={`flex h-11 w-11 items-center justify-center rounded-2xl ${locationSharing ? 'bg-white/20 animate-pulse' : 'bg-blue-50 text-blue-600'}`}>
-                {locationSharing ? <Share2 size={20} className="text-white" /> : <MapPin size={20} />}
-              </div>
-              <span className={`text-sm font-bold leading-snug whitespace-pre-line ${locationSharing ? 'text-white' : 'text-nari-navy'}`}>
-                {locationSharing ? 'Stop Sharing' : 'Share Live\nLocation'}
-              </span>
-              <span className={`mt-auto text-xs leading-5 ${locationSharing ? 'text-blue-100' : 'text-gray-500'}`}>
-                {locationSharing ? 'Tap again to stop the live location stream.' : 'Send a fast trackable map link to trusted contacts.'}
-              </span>
-            </button>
+              {emergency ? 'Live location alert active.' : 'Press and hold for 3 seconds'}
+            </p>
 
-            <button
-              onClick={() => toggleRecording('audio', setAudioRecording)}
-              aria-pressed={audioRecording}
-              className={`zomato-card flex min-h-[152px] flex-col gap-3 p-4 text-left transition-all active:scale-95 ${
-                audioRecording ? 'bg-red-500 text-white shadow-[0_18px_40px_rgba(239,68,68,0.2)]' : 'bg-white hover:bg-red-50'
-              }`}
-            >
-              <div className={`flex h-11 w-11 items-center justify-center rounded-2xl ${audioRecording ? 'bg-white/20 animate-pulse' : 'bg-red-50 text-red-600'}`}>
-                {audioRecording ? <StopCircle size={20} className="text-white" /> : <Mic size={20} />}
-              </div>
-              <span className={`text-sm font-bold leading-snug whitespace-pre-line ${audioRecording ? 'text-white' : 'text-nari-navy'}`}>
-                {audioRecording ? 'Stop Audio' : 'Start Audio\nRecording'}
-              </span>
-              <span className={`mt-auto text-xs leading-5 ${audioRecording ? 'text-red-50' : 'text-gray-500'}`}>
-                Capture audio evidence in the background and save it locally on stop.
-              </span>
-            </button>
+            {emergency && (
+              <button
+                onClick={stopEmergency}
+                className="mt-4 flex w-full max-w-xs items-center justify-center gap-2 rounded-xl bg-nari-ink px-6 py-3 font-bold text-white transition-colors hover:bg-nari-navy active:scale-[0.98]"
+              >
+                <XCircle size={18} />
+                Disarm emergency
+              </button>
+            )}
+          </section>
 
-            <button
-              onClick={() => toggleRecording('video', setVideoRecording)}
-              aria-pressed={videoRecording}
-              className={`zomato-card flex min-h-[152px] flex-col gap-3 p-4 text-left transition-all active:scale-95 ${
-                videoRecording ? 'bg-teal-500 text-white shadow-[0_18px_40px_rgba(20,184,166,0.2)]' : 'bg-white hover:bg-teal-50'
-              }`}
-            >
-              <div className={`flex h-11 w-11 items-center justify-center rounded-2xl ${videoRecording ? 'bg-white/20 animate-pulse' : 'bg-teal-50 text-teal-600'}`}>
-                {videoRecording ? <StopCircle size={20} className="text-white" /> : <Video size={20} />}
+          <div className="flex flex-col gap-8">
+            <section aria-labelledby="quick-actions">
+              <h2 id="quick-actions" className="mb-3 text-xl font-bold text-nari-navy">Quick actions</h2>
+              <div className="grid grid-cols-2 gap-3">
+                <ActionTile
+                  icon={MapPin}
+                  activeIcon={Share2}
+                  active={locationSharing}
+                  onClick={handleShareLocationToggle}
+                  title={locationSharing ? 'Stop sharing' : 'Share live location'}
+                  hint={locationSharing ? 'Tap to stop the location stream.' : 'Send a map link to people you trust.'}
+                />
+                <ActionTile
+                  icon={Mic}
+                  activeIcon={StopCircle}
+                  tone="red"
+                  active={audioRecording}
+                  onClick={() => toggleRecording('audio', setAudioRecording)}
+                  title={audioRecording ? 'Stop audio' : 'Record audio'}
+                  hint={audioRecording ? 'Recording. Tap to stop and save.' : 'Saves to your downloads when you stop.'}
+                />
+                <ActionTile
+                  icon={Video}
+                  activeIcon={StopCircle}
+                  tone="red"
+                  active={videoRecording}
+                  onClick={() => toggleRecording('video', setVideoRecording)}
+                  title={videoRecording ? 'Stop video' : 'Record video'}
+                  hint={videoRecording ? 'Recording. Tap to stop and save.' : 'Camera and microphone together.'}
+                />
+                <ActionTile
+                  icon={Route}
+                  onClick={handleSafeRoutes}
+                  title="Find help nearby"
+                  hint="Opens police stations near you in Maps."
+                />
               </div>
-              <span className={`text-sm font-bold leading-snug whitespace-pre-line ${videoRecording ? 'text-white' : 'text-nari-navy'}`}>
-                {videoRecording ? 'Stop Video' : 'Start Video\nRecording'}
-              </span>
-              <span className={`mt-auto text-xs leading-5 ${videoRecording ? 'text-teal-50' : 'text-gray-500'}`}>
-                Record video with audio for fast evidence capture during an incident.
-              </span>
-            </button>
 
-            <button
-              onClick={handleSafeRoutes}
-              className="zomato-card flex min-h-[152px] flex-col gap-3 bg-white p-4 text-left transition-all hover:bg-emerald-50 active:scale-95"
-            >
-              <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-emerald-50 text-emerald-700">
-                <Route size={20} />
-              </div>
-              <span className="text-sm font-bold leading-snug whitespace-pre-line text-nari-navy">Find Safe{`\n`}Routes</span>
-              <span className="mt-auto text-xs leading-5 text-gray-500">
-                Open nearby police and help points based on your current location.
-              </span>
-            </button>
-          </div>
-
-          {locationSharing && locationUrl && (
-            <div className="flex items-center gap-3 rounded-[1.75rem] border border-blue-200 bg-blue-50 px-4 py-3">
-              <div className="h-2.5 w-2.5 flex-shrink-0 rounded-full bg-blue-500 animate-pulse" />
-              <div className="min-w-0 flex-1">
-                <div className="mb-0.5 text-xs font-black uppercase tracking-widest text-blue-700">Live Tracking Active</div>
-                <a href={locationUrl} target="_blank" rel="noreferrer" className="block truncate text-xs font-medium text-blue-600 underline">
-                  {locationUrl}
-                </a>
-              </div>
-            </div>
-          )}
-
-          <div className="zomato-card overflow-hidden bg-white p-0">
-            <div className="relative overflow-hidden rounded-[1.8rem] bg-[radial-gradient(circle_at_top_right,_rgba(79,209,197,0.22),_transparent_38%),linear-gradient(135deg,_#1A365D_0%,_#25538C_55%,_#4FD1C5_130%)] px-5 py-5 text-white">
-              <div className="absolute -right-10 top-6 h-28 w-28 rounded-full bg-white/10 blur-2xl" />
-              <div className="absolute bottom-0 left-0 h-20 w-full bg-[linear-gradient(180deg,transparent,rgba(255,255,255,0.08))]" />
-              <div className="relative z-10">
-                <div className="text-[11px] font-black uppercase tracking-[0.26em] text-white/70">Safety Snapshot</div>
-                <div className="mt-2 text-xl font-black tracking-tight">Nearby support at a glance</div>
-                <p className="mt-2 max-w-xs text-sm leading-6 text-white/80">
-                  Use the map page for detailed routes, incident clusters, and verified safe spaces around you.
-                </p>
-                <div className="mt-5 flex flex-wrap gap-2">
-                  {['Police stations', 'Hospitals', 'Safe zones'].map((item) => (
-                    <span key={item} className="rounded-full bg-white/12 px-3 py-1.5 text-xs font-semibold text-white/90 backdrop-blur-sm">
-                      {item}
-                    </span>
-                  ))}
+              {locationSharing && locationUrl && (
+                <div className="mt-3 flex items-center gap-3 rounded-2xl border border-nari-navy/15 bg-white px-4 py-3">
+                  <span className="h-2.5 w-2.5 flex-shrink-0 rounded-full bg-nari-teal animate-pulse" />
+                  <div className="min-w-0 flex-1">
+                    <div className="text-sm font-bold text-nari-navy">Sharing your location</div>
+                    <a href={locationUrl} target="_blank" rel="noreferrer" className="block truncate text-[13px] font-medium text-nari-navy underline">
+                      {locationUrl}
+                    </a>
+                  </div>
                 </div>
-              </div>
-            </div>
-          </div>
+              )}
+            </section>
 
-          <div className="rounded-[2rem] border border-gray-100 bg-white p-5 shadow-sm">
-            <div className="mb-3 text-xs font-bold uppercase tracking-widest text-gray-500">One-Tap Emergency</div>
-            <div className="flex flex-col gap-2">
-              {[
-                { name: 'Police Control Room', number: '100', color: 'text-blue-600', bg: 'bg-blue-50' },
-                { name: 'Women Helpline', number: '1091', color: 'text-pink-600', bg: 'bg-pink-50' },
-                { name: 'Ambulance', number: '108', color: 'text-red-600', bg: 'bg-red-50' },
-              ].map((contact) => (
-                <a
-                  key={contact.name}
-                  href={`tel:${contact.number}`}
-                  className="flex items-center justify-between rounded-2xl border border-gray-100 bg-gray-50 p-3 transition-colors active:scale-[0.98] hover:bg-white"
-                >
-                  <div className="flex items-center gap-3">
-                    <div className={`flex h-10 w-10 items-center justify-center rounded-xl ${contact.bg} ${contact.color}`}>
-                      <Phone size={18} fill="currentColor" opacity={0.2} />
-                    </div>
-                    <span className="text-sm font-bold text-nari-navy">{contact.name}</span>
-                  </div>
-                  <div className="rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-sm font-black text-gray-700 shadow-sm">
-                    {contact.number}
-                  </div>
-                </a>
-              ))}
-            </div>
-          </div>
+            <section aria-labelledby="call-directly">
+              <h2 id="call-directly" className="mb-3 text-xl font-bold text-nari-navy">Call directly</h2>
+              <ul className="nari-card divide-y divide-nari-navy/10 overflow-hidden">
+                {CONTACTS.map(({ name, number }) => (
+                  <li key={number}>
+                    <a href={`tel:${number}`} className="flex items-center justify-between gap-4 px-4 py-3.5 transition-colors hover:bg-nari-navy/[0.03]">
+                      <span className="flex items-center gap-3 text-[15px] font-semibold text-nari-navy">
+                        <Phone size={17} className="text-nari-coral-deep" aria-hidden="true" />
+                        {name}
+                      </span>
+                      <span className="font-display text-lg font-bold tabular-nums text-nari-navy">{number}</span>
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </section>
 
-          <div className="mb-2 flex items-start gap-3 rounded-2xl bg-gray-100 p-4">
-            <AlertTriangle size={16} className="mt-0.5 flex-shrink-0 text-gray-500" />
-            <div className="text-xs font-medium text-gray-600">
-              <span className="font-bold text-gray-800">Tip:</span> Add NARI to your home screen for one-tap access. Recording and live alerts keep running while you switch pages, but stop if the browser tab is closed.
-            </div>
+            <Link
+              to="/map"
+              className="flex items-center gap-3 rounded-2xl bg-nari-navy px-5 py-4 text-white transition-colors hover:bg-nari-ink"
+            >
+              <MapPin size={20} className="flex-shrink-0 text-nari-teal" aria-hidden="true" />
+              <span>
+                <span className="block text-[15px] font-bold">Open the safety map</span>
+                <span className="block text-[13px] text-white/75">Recent incidents, police stations, hospitals and safe zones.</span>
+              </span>
+            </Link>
           </div>
         </div>
+
+        <p className="mt-8 max-w-2xl text-[13px] leading-5 text-gray-600">
+          Add NARI to your home screen for one-tap access. Recording and live alerts keep running while you switch pages, but stop if the browser tab is closed.
+        </p>
       </div>
 
       {toast && (
         <div
           role="status"
-          className={`fixed bottom-28 left-1/2 z-50 flex w-[calc(100%-2rem)] max-w-sm -translate-x-1/2 items-center gap-2 rounded-2xl px-5 py-3 text-sm font-bold text-white shadow-xl ${
-            toast.type === 'success' ? 'bg-emerald-600' : toast.type === 'error' ? 'bg-red-600' : 'bg-gray-900'
+          className={`fixed bottom-6 left-1/2 z-50 flex w-[calc(100%-2rem)] max-w-sm -translate-x-1/2 items-center gap-2 rounded-xl px-5 py-3 text-sm font-bold text-white shadow-xl ${
+            toast.type === 'success' ? 'bg-emerald-700' : toast.type === 'error' ? 'bg-red-600' : 'bg-nari-ink'
           }`}
         >
           {toast.type === 'success' ? (

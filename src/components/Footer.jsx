@@ -6,7 +6,7 @@ export default function Footer() {
   const year = new Date().getFullYear();
 
   return (
-    <footer className="mt-16 border-t border-nari-navy/10 bg-white/75 px-4 py-10 backdrop-blur-sm">
+    <footer className="border-t border-nari-navy/10 bg-white px-4 py-10">
       <div className="mx-auto max-w-7xl">
         <div className="grid grid-cols-1 gap-8 md:grid-cols-[1.2fr_0.9fr_0.9fr]">
           <div>
@@ -14,7 +14,7 @@ export default function Footer() {
               <NariLogo size={42} />
               <div>
                 <div className="font-display text-xl font-black tracking-[0.2em] text-nari-navy">NARI</div>
-                <div className="text-[11px] font-semibold uppercase tracking-[0.3em] text-nari-navy/45">Safety OS</div>
+                <div className="text-[11px] font-semibold uppercase tracking-[0.3em] text-nari-navy/70">Safety OS</div>
               </div>
             </div>
             <p className="max-w-md text-sm leading-relaxed text-gray-600">
@@ -23,7 +23,7 @@ export default function Footer() {
           </div>
 
           <div>
-            <h2 className="mb-3 text-sm font-semibold uppercase tracking-[0.2em] text-nari-navy">Platform</h2>
+            <h2 className="mb-3 text-base font-bold text-nari-navy">Platform</h2>
             <ul className="space-y-1">
               {[
                 { to: '/report', label: 'File a Report' },
@@ -41,7 +41,7 @@ export default function Footer() {
           </div>
 
           <div>
-            <h2 className="mb-3 text-sm font-semibold uppercase tracking-[0.2em] text-nari-navy">Emergency</h2>
+            <h2 className="mb-3 text-base font-bold text-nari-navy">Emergency numbers</h2>
             <ul className="space-y-2.5">
               {[
                 { label: 'Police', num: '100' },
@@ -51,7 +51,7 @@ export default function Footer() {
               ].map(({ label, num }) => (
                 <li key={num} className="flex items-center justify-between gap-4">
                   <span className="text-sm text-gray-600">{label}</span>
-                  <a href={`tel:${num}`} className="rounded-full px-3 py-1 text-sm font-bold text-nari-coral transition-colors hover:text-[#e55353]">
+                  <a href={`tel:${num}`} className="rounded-full px-3 py-1 text-sm font-bold text-nari-coral-deep transition-colors hover:text-[#ad2936]">
                     {num}
                   </a>
                 </li>
@@ -63,7 +63,7 @@ export default function Footer() {
         <div className="mt-8 flex flex-col items-center justify-between gap-3 border-t border-nari-navy/10 pt-6 text-center md:flex-row md:text-left">
           <p className="text-xs text-gray-600">&copy; {year} NARI Safety OS. All rights reserved.</p>
           <p className="flex items-center gap-1 text-xs text-gray-600">
-            Made with <Heart size={11} className="text-nari-coral" /> for safer communities
+            Made with <Heart size={11} className="text-nari-coral-deep" /> for safer communities
           </p>
         </div>
       </div>

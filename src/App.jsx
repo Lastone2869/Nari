@@ -33,7 +33,7 @@ export default function App() {
   return (
     <AuthProvider>
       <BrowserRouter>
-        <div className="noise flex min-h-screen flex-col">
+        <div className="flex min-h-screen flex-col">
           <Navbar />
           <main className="flex-1">
             <Suspense fallback={<Spinner />}>
@@ -58,7 +58,7 @@ export default function App() {
                   path="*"
                   element={
                     <div className="flex min-h-screen flex-col items-center justify-center px-4 pt-20 text-center">
-                      <div className="mb-5 flex h-20 w-20 items-center justify-center rounded-full bg-nari-coral/10 text-2xl font-black text-nari-coral">
+                      <div className="mb-5 flex h-20 w-20 items-center justify-center rounded-full bg-nari-coral/10 text-2xl font-black text-nari-coral-deep">
                         404
                       </div>
                       <h2 className="mb-2 font-display text-3xl font-bold text-nari-navy">Page Not Found</h2>

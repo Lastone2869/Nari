@@ -57,7 +57,7 @@ function SafetyScore({ score }) {
   const label = score >= 70 ? 'SAFE' : score >= 40 ? 'MODERATE' : 'UNSAFE';
 
   return (
-    <div className="glass-card flex items-center gap-4 rounded-2xl p-4 shadow-sm">
+    <div className="nari-card flex items-center gap-4 rounded-2xl p-4 shadow-sm">
       <div className="relative h-16 w-16 flex-shrink-0">
         <svg viewBox="0 0 36 36" className="h-16 w-16 -rotate-90">
           <circle cx="18" cy="18" r="14" fill="none" stroke="rgba(26,54,93,0.06)" strokeWidth="3.5" />
@@ -104,18 +104,18 @@ export default function SafetyMap() {
   const toggleFilter = (k) => setFilters((f) => ({ ...f, [k]: !f[k] }));
 
   const filterBtns = [
-    { key: 'reports', label: 'Incidents', color: 'text-nari-coral border-nari-coral/40 bg-nari-coral/10' },
-    { key: 'safe_zone', label: 'Safe Zones', color: 'text-nari-teal border-nari-teal/40 bg-nari-teal/10' },
-    { key: 'police', label: 'Police', color: 'text-blue-500 border-blue-500/40 bg-blue-500/10' },
-    { key: 'hospital', label: 'Hospitals', color: 'text-nari-amber border-nari-amber/40 bg-nari-amber/10' },
+    { key: 'reports', label: 'Incidents', color: 'text-red-800 border-nari-coral/40 bg-nari-coral/10' },
+    { key: 'safe_zone', label: 'Safe Zones', color: 'text-nari-teal-deep border-nari-teal/40 bg-nari-teal/10' },
+    { key: 'police', label: 'Police', color: 'text-blue-700 border-blue-500/40 bg-blue-500/10' },
+    { key: 'hospital', label: 'Hospitals', color: 'text-nari-amber-deep border-nari-amber/40 bg-nari-amber/10' },
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50/50 px-4 pb-10 pt-24">
+    <div className="min-h-screen px-4 pb-16 pt-28">
       <div className="mx-auto max-w-6xl">
         <div className="mb-8 flex flex-col justify-between gap-4 md:flex-row md:items-center">
           <div>
-            <h1 className="mb-2 text-4xl font-black tracking-tight text-nari-navy">Safety Map</h1>
+            <h1 className="mb-2 text-3xl font-extrabold tracking-tight text-nari-navy sm:text-4xl">Safety map</h1>
             <p className="text-base text-gray-600">Live incidents, safe spaces, and area safety scores.</p>
           </div>
           <SafetyScore score={score} />
@@ -151,10 +151,10 @@ export default function SafetyMap() {
           ))}
         </div>
 
-        <div className="relative mb-10 h-[60vh] min-h-[500px] w-full overflow-hidden rounded-[2rem] border-[12px] border-white bg-gray-100 shadow-xl">
+        <div className="relative mb-10 h-[60vh] min-h-[420px] w-full overflow-hidden rounded-[1.25rem] border border-nari-navy/10 bg-white">
           {!MAPS_API_KEY ? (
-            <div className="glass-card flex h-full w-full flex-col items-center justify-center rounded-2xl">
-              <MapPin size={40} className="mb-3 animate-float text-nari-teal" />
+            <div className="flex h-full w-full flex-col items-center justify-center">
+              <MapPin size={40} className="mb-3 animate-float text-nari-teal-deep" />
               <p className="mb-1 font-bold text-nari-navy">Google Maps</p>
               <p className="max-w-xs text-center text-sm text-gray-600">
                 Add your Google Maps API key in <code className="font-mono text-[#0C857B]">VITE_GOOGLE_MAPS_API_KEY</code> to enable the live map.
@@ -229,7 +229,7 @@ export default function SafetyMap() {
                             {SPACE_LABELS[selected.data.type]} {selected.data.name}
                           </div>
                           <div className="mt-1 text-xs capitalize text-gray-600">{selected.data.type?.replace('_', ' ')}</div>
-                          {selected.data.verified && <div className="mt-1 text-xs font-bold text-nari-teal">Verified</div>}
+                          {selected.data.verified && <div className="mt-1 text-xs font-bold text-nari-teal-deep">Verified</div>}
                         </>
                       )}
                     </div>
@@ -244,7 +244,7 @@ export default function SafetyMap() {
           <h2 className="mb-4 text-xl font-black text-nari-navy">Recent Incidents ({reports.length})</h2>
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             {reports.slice(0, 6).map((r) => (
-              <div key={r.id} className="zomato-card flex items-start gap-4 bg-white p-5">
+              <div key={r.id} className="nari-card flex items-start gap-4 bg-white p-5">
                 <div className="mt-1 h-3 w-3 flex-shrink-0 rounded-full" style={{ backgroundColor: CATEGORY_COLORS[r.type] || '#6b7280' }} />
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center justify-between gap-2">
